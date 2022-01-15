@@ -362,13 +362,11 @@ void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 		chunk.assignObjectToChunk(starObject.pointer);
 
 		//test planet
-		Planet planetObject = Planet({ starObject.xPos(), starObject.yPos() + 5500.0f,
-			10.0f, 2.3f, 0.5, PlanetType::BLUE_ROCKY, starObject.xPos(), starObject.yPos() },
+		Planet planetObject = Planet({ 10.0f, 2.3f, 0.5, PlanetType::BLUE_ROCKY, starObject.xPos(), starObject.yPos(), 5500.0f },
 			starObject.m_Temperature, m_PlanetsInstructionsList.size());
 		chunk.assignObjectToChunk(planetObject.pointer);
 		m_PlanetsList.push_back(planetObject);
-		m_PlanetsInstructionsList.push_back({ starObject.xPos(), starObject.yPos(),
-			10.0f, 0.0f, 5.0f, PlanetType::BLUE_ROCKY, starObject.xPos(), starObject.yPos(), 500.0f });
+		m_PlanetsInstructionsList.push_back({ 10.0f, 0.0f, 5.0f, PlanetType::BLUE_ROCKY, starObject.xPos(), starObject.yPos(), 5500.0f });
 
 		m_GenStar = false;
 		m_StarGenCount = 0;

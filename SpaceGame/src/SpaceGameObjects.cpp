@@ -242,8 +242,9 @@ Planet::Planet(PlanetInfo planet, StarColor parentColor, unsigned int index) {
 	//set pointer
 	pointer = { ObjectType::Planet, index };
 
-	m_XPos = planet.x;
-	m_YPos = planet.y;
+	//x and y pos are dependant on rotation
+	m_XPos = 0.0f;
+	m_YPos = 0.0f;
 	m_RotationX = planet.rotationX;
 	m_RotationY = planet.rotationY;
 	m_Angle = planet.angle;
@@ -255,7 +256,7 @@ Planet::Planet(PlanetInfo planet, StarColor parentColor, unsigned int index) {
 	m_Radius = sqrt(m_Mass / SG_PI) * 100.0f;
 
 	//make circle
-	m_Orbital = CreateCircle(m_XPos, m_YPos + m_OrbitDistance, m_Radius);
+	m_Orbital = CreateCircle(m_RotationX, m_RotationY + m_OrbitDistance, m_Radius);
 
 	//sets type
 	m_Type = planet.type;
@@ -308,11 +309,11 @@ Planet::Planet(PlanetInfo planet, StarColor parentColor, unsigned int index) {
 
 	ColorShape(&m_Orbital, r + rOff, g + gOff, b + bOff, Shape::CIRCLE);
 
-	//color first 32 vertices, then rotate by angle degrees - angle should be init to 0
+	//color first 32 vertices, then rotate by angle degrees
 	for (int i = 1; i < 33; i++) {
 		ColorShapeVertex(&m_Orbital, i, r - 0.06f, g - 0.1f, b - 0.08f, Shape::CIRCLE);
 	}
-
+	
 	//rotate planet relative to star
 	RotateShape(&m_Orbital, m_RotationX, m_RotationY, m_Angle, Shape::CIRCLE);
 }

@@ -128,7 +128,7 @@ enum class PlanetType
 
 struct PlanetInfo 
 {
-	float x; float y; float mass; float angle; float velocity; PlanetType type;
+	float mass; float angle; float velocity; PlanetType type;
 	float rotationX; float rotationY; float orbitDistance;
 };
 
@@ -139,7 +139,7 @@ public:
 	Planet(PlanetInfo planet, StarColor parentColor, unsigned int index);
 
 	void update(double deltaTime);
-	PlanetInfo unload() const { return {m_CurrentChunk.x * CHUNK_TO_WORLD_FACTOR, m_CurrentChunk.y * CHUNK_TO_WORLD_FACTOR, m_Mass, m_Angle, m_Velocity, m_Type, m_RotationX, m_RotationY}; }
+	PlanetInfo unload() const { return {m_Mass, m_Angle, m_Velocity, m_Type, m_RotationX, m_RotationY, m_OrbitDistance}; }
 
 private:
 
