@@ -333,14 +333,14 @@ void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float or
 
 	switch (parentColor) {
 	case StarColor::RED_DWARF:
-		distanceFactor = orbitDistance / 2000.0f;
+		distanceFactor = orbitDistance / MINIMUM_ORBIT_RED_DWARF;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;
 		}
 		rOff = 0.30f / distanceFactor;
 		break;
 	case StarColor::SOLAR:
-		distanceFactor = orbitDistance / 5000.0f;
+		distanceFactor = orbitDistance / MINIMUM_ORBIT_SOLAR;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;
 		}
@@ -349,7 +349,7 @@ void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float or
 		bOff = 0.13f / distanceFactor;
 		break;
 	case StarColor::RED_GIANT:
-		distanceFactor = orbitDistance / 8000.0f;
+		distanceFactor = orbitDistance / MINIMUM_ORBIT_RED_GIANT;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;
 		}
@@ -357,7 +357,7 @@ void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float or
 		gOff = 0.12f / distanceFactor;
 		break;
 	case StarColor::BLUE_GIANT:
-		distanceFactor = orbitDistance / 10000.0f;
+		distanceFactor = orbitDistance / MINIMUM_ORBIT_BLUE_GIANT;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;
 		}

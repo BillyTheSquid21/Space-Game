@@ -274,7 +274,7 @@ void World::checkStarGen() {
 	//stops star from spawning until x many chunk cycles - should stop from being next to each other
 	if (!m_GenStar) {
 		m_StarGenCount++;
-		if (m_StarGenCount >= 32) {
+		if (m_StarGenCount >= 6) {
 			m_GenStar = true;
 		}
 	}
@@ -309,7 +309,7 @@ void World::update(double deltaTime) {
 void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 	//have chance of creating star - planets are bound to origin chunk
 	int random = (rand() % 2000) + 1;
-	if (random < 240) {
+	if (random < 1500) {
 
 		StarInfo starInfo = {};
 
@@ -361,8 +361,32 @@ void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 		//assign to chunk
 		chunk.assignObjectToChunk(starObject.pointer);
 
-		//test planet
-		generatePlanet(&starObject, chunk, 5500.0f);
+		//create up to 9 planets
+		int planetCount = (rand() % 9) + 1;
+		float distanceFromStar = 0.0f;
+		switch (starObject.m_Temperature) 
+		{
+		case StarColor::RED_DWARF:
+			distanceFromStar = MINIMUM_ORBIT_RED_DWARF + (rand() % 200);
+			break;
+		case StarColor::SOLAR:
+			distanceFromStar = MINIMUM_ORBIT_SOLAR + (rand() % 200);;
+			break;
+		case StarColor::RED_GIANT:
+			distanceFromStar = MINIMUM_ORBIT_RED_GIANT + (rand() % 200);
+			break;
+		case StarColor::BLUE_GIANT:
+			distanceFromStar = MINIMUM_ORBIT_BLUE_GIANT + (rand() % 200);;
+			break;
+		default:
+			distanceFromStar = MINIMUM_ORBIT_RED_DWARF + (rand() % 200);;
+			break;
+		}
+		//make each planet, incrementing orbit distance
+		for (int i = 0; i < planetCount; i++) {
+			generatePlanet(&starObject, chunk, distanceFromStar);
+			distanceFromStar += (rand() % 2000) + 1000.0f;
+		}
 
 		m_GenStar = false;
 		m_StarGenCount = 0;
@@ -387,10 +411,10 @@ void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance)
 	}
 
 	//randomise angle - approx 2pi in int form although will have bias to near 0 deg
-	angle = (float)(rand() % 7);
+	angle = (float)(rand() % 62831) / 10000.0f;
 
 	//randomise velocity - between 0.5 units and 10
-	velocity = (float)(rand() % 1) + 0.5f;
+	velocity = ((float)(rand() % 100000) / 100000.0f) + 0.00001f;
 
 	//assign and push
 	PlanetInfo planetInfo = { mass, angle, velocity, type, parent->xPos(), parent->yPos(), orbitDistance };

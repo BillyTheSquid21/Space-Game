@@ -4,7 +4,7 @@ bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback 
 	bool initSuccess = Game::init(name, kCallback, sCallback);
 
 	//create ship
-	m_Ship = Ship(35.0f);
+	m_Ship = Ship(70.0f);
 	m_Ship.setRenderer(&m_Renderer);
 
 	//init world
@@ -13,8 +13,8 @@ bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback 
 	m_World.initialGenerateChunks();
 
 	//init renderer
-	m_Renderer.camera.setZoomCamera(0.75f);
-	m_ZoomLevel = 0.75;
+	m_Renderer.camera.setZoomCamera(0.1f);
+	m_ZoomLevel = 0.1;
 
 	return initSuccess;
 }
@@ -102,12 +102,12 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 }
 
 void SpaceGame::handleScrolling(double xOffset, double yOffset) {
-	if (yOffset > 0 && m_ZoomLevel < 3.0f) {
-		m_Renderer.camera.zoomCamera(0.05f);
-		m_ZoomLevel += 0.05f;
+	if (yOffset > 0 && m_ZoomLevel < 1.0f) {
+		m_Renderer.camera.zoomCamera(0.005f);
+		m_ZoomLevel += 0.005f;
 	}
-	else if (yOffset < 0 && m_ZoomLevel > 0.02f) {
-		m_Renderer.camera.zoomCamera(-0.05f);
-		m_ZoomLevel += -0.05f;
+	else if (yOffset < 0 && m_ZoomLevel > 0.05f) {
+		m_Renderer.camera.zoomCamera(-0.005f);
+		m_ZoomLevel += -0.005f;
 	}
 }

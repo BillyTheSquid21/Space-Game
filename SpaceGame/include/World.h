@@ -43,7 +43,7 @@ private:
 	std::vector<Star> m_StarsList;
 	std::vector<StarInfo> m_StarsInstructionsList;
 	void checkStarGen();
-	unsigned int m_StarGenCount = 32; //number of cycles before a star can gen
+	unsigned int m_StarGenCount = 2; //number of cycles before a star can gen
 	bool m_GenStar = true;
 
 	//Planets

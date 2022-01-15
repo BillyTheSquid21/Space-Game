@@ -5,11 +5,17 @@
 #include "Renderer.h"
 #include "ObjectManagement.h"
 
-const float CHUNK_TO_WORLD_FACTOR = 2560.0f; //2560 coords in 1 chunk
-const unsigned char DRAW_LIMIT = 4;
+const float CHUNK_TO_WORLD_FACTOR = 9820.0f; //2560 coords in 1 chunk
+const unsigned char DRAW_LIMIT = 3;
 
 //Keeps track of how many chunks are generated in one cycle
 constexpr unsigned int CHUNK_CYCLES_TOTAL = ((DRAW_LIMIT * 2) - 1) * ((DRAW_LIMIT * 2) - 1);
+
+//Define minimum distance a planet can spawn to a star
+const float MINIMUM_ORBIT_RED_DWARF = 2000.0f;
+const float MINIMUM_ORBIT_SOLAR = 3300.0f;
+const float MINIMUM_ORBIT_RED_GIANT = 3800.0f;
+const float MINIMUM_ORBIT_BLUE_GIANT = 4000.0f;
 
 struct ChunkLocation
 {
