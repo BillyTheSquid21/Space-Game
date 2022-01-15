@@ -362,13 +362,40 @@ void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 		chunk.assignObjectToChunk(starObject.pointer);
 
 		//test planet
-		Planet planetObject = Planet({ 10.0f, 2.3f, 0.5, PlanetType::BLUE_ROCKY, starObject.xPos(), starObject.yPos(), 5500.0f },
-			starObject.m_Temperature, m_PlanetsInstructionsList.size());
-		chunk.assignObjectToChunk(planetObject.pointer);
-		m_PlanetsList.push_back(planetObject);
-		m_PlanetsInstructionsList.push_back({ 10.0f, 0.0f, 5.0f, PlanetType::BLUE_ROCKY, starObject.xPos(), starObject.yPos(), 5500.0f });
+		generatePlanet(&starObject, chunk, 5500.0f);
 
 		m_GenStar = false;
 		m_StarGenCount = 0;
 	}
+}
+
+//generate Planets
+void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance) 
+{	
+	//initialise values to assign to planet
+	PlanetType type = ReturnRandomPlanet();
+	float mass = 1.0f;
+	float angle = 0.0f;
+	float velocity = 0.0f;
+
+	//generate mass - Grey rocky is last rocky planet and all rocky and gas planets have same mass probs
+	if ((int)type < (int)(PlanetType::GREY_ROCKY)) {
+		mass = (float)(rand() % 25) + 5.0f;
+	}
+	else {
+		mass = (float)(rand() % 55) + 30.0f;
+	}
+
+	//randomise angle - approx 2pi in int form although will have bias to near 0 deg
+	angle = (float)(rand() % 7);
+
+	//randomise velocity - between 0.5 units and 10
+	velocity = (float)(rand() % 1) + 0.5f;
+
+	//assign and push
+	PlanetInfo planetInfo = { mass, angle, velocity, type, parent->xPos(), parent->yPos(), orbitDistance };
+	Planet planetObject = Planet(planetInfo, parent->m_Temperature, m_PlanetsInstructionsList.size());
+	chunk.assignObjectToChunk(planetObject.pointer);
+	m_PlanetsList.push_back(planetObject);
+	m_PlanetsInstructionsList.push_back(planetInfo);
 }

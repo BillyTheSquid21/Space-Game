@@ -36,6 +36,7 @@ private:
 
 	//Generators
 	void generateSolarSystem(int x, int y, Chunk& chunk);
+	void generatePlanet(Star* parent, Chunk& chunk, float orbitDistance);
 	void generateChunkRange(ChunkLocation originChunk);
 
 	//Stars

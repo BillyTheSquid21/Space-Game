@@ -169,6 +169,7 @@
     <ClInclude Include="include\SpaceGame.h" />
     <ClInclude Include="include\SpaceGameObjects.h" />
     <ClInclude Include="include\World.h" />
+    <ClInclude Include="SGPhysics.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Default.shader" />

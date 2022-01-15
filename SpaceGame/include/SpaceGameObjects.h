@@ -120,10 +120,14 @@ private:
 	Circle m_Light;
 };
 
-//planets
+//PLANETS
 enum class PlanetType
 {
-	BLUE_ROCKY,
+	BLUE_ROCKY, RED_ROCKY, GREEN_ROCKY, GREY_ROCKY,
+	BLUE_GAS, RED_GAS, GREEN_GAS, YELLOW_GAS,
+
+	//at end, and also default
+	END
 };
 
 struct PlanetInfo 
@@ -131,6 +135,30 @@ struct PlanetInfo
 	float mass; float angle; float velocity; PlanetType type;
 	float rotationX; float rotationY; float orbitDistance;
 };
+
+//Planet probabilities
+const int PLANET_MAX_PROBABILITY = 2000; 
+struct PlanetProbability
+{	
+	//all have a range within max - if random num lands between
+	unsigned int BLUE_ROCKY = 0;
+	unsigned int RED_ROCKY = 250;
+	unsigned int GREEN_ROCKY = 500;
+	unsigned int GREY_ROCKY = 650;
+	unsigned int BLUE_GAS = 1000;
+	unsigned int RED_GAS = 1350;
+	unsigned int GREEN_GAS = 1700;
+	unsigned int YELLOW_GAS = 1900;
+};
+
+//stores probabilities
+static PlanetProbability s_PlanetProbabilities;
+
+//gives random planet type
+PlanetType ReturnRandomPlanet(); 
+
+//colors planet - contains data for how to
+void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float orbitDistance);
 
 class Planet : public Orbital
 {

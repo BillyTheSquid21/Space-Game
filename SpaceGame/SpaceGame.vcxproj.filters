@@ -77,10 +77,13 @@
     <ClInclude Include="include\World.h">
       <Filter>Header Files\Game Specific</Filter>
     </ClInclude>
-    <ClInclude Include="include\Chunk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ObjectManagement.h">
+      <Filter>Header Files\Game Specific</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Chunk.h">
+      <Filter>Header Files\Game Specific</Filter>
+    </ClInclude>
+    <ClInclude Include="SGPhysics.h">
       <Filter>Header Files\Game Specific</Filter>
     </ClInclude>
   </ItemGroup>

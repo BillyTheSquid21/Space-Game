@@ -262,60 +262,117 @@ Planet::Planet(PlanetInfo planet, StarColor parentColor, unsigned int index) {
 	m_Type = planet.type;
 
 	//all planets assumed to be created at 12 o clock relative to parent star
+	ColorPlanet(m_Type, parentColor, &m_Orbital, m_OrbitDistance);
+	
+	//rotate planet relative to star
+	RotateShape(&m_Orbital, m_RotationX, m_RotationY, m_Angle, Shape::CIRCLE);
+}
 
-	//setup color
+//Colors planets with lighting depending on parent star - all decided on creation and not modified
+void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float orbitDistance) {
+	//setup color - keep base color <= 0.65 to avoid clamping - and to keep dark
 	float r = 0.0f;
 	float g = 0.0f;
 	float b = 0.0f;
 
-	switch (m_Type) {
+	switch (type) {
 	case PlanetType::BLUE_ROCKY:
-		r = 0.2f;
-		g = 0.4f;
-		b = 0.82f;
+		r = 0.1f;
+		g = 0.3f;
+		b = 0.62f;
 		break;
+	case PlanetType::GREEN_ROCKY:
+		r = 0.1f;
+		g = 0.62f;
+		b = 0.33f;
+		break;
+	case PlanetType::RED_ROCKY:
+		r = 0.64f;
+		g = 0.02f;
+		b = 0.05f;
+		break;
+	case PlanetType::GREY_ROCKY:
+		r = 0.57f;
+		g = 0.54f;
+		b = 0.58f;
+		break;
+	case PlanetType::BLUE_GAS:
+		r = 0.13f;
+		g = 0.23f;
+		b = 0.65f;
+		break;
+	case PlanetType::RED_GAS:
+		r = 0.63f;
+		g = 0.13f;
+		b = 0.02f;
+		break;
+	case PlanetType::GREEN_GAS:
+		r = 0.03f;
+		g = 0.64f;
+		b = 0.15f;
+		break;
+	case PlanetType::YELLOW_GAS:
+		r = 0.03f;
+		g = 0.65f;
+		b = 0.62f;
 	default:
-		r = 1.0f;
+		r = 0.5f;
 		g = 0.0f;
-		b = 1.0f;
+		b = 0.5f;
 		break;
 	}
 
-	//adjust front face lighting
+	//adjust front face lighting - max change +0.35 - if followed should be in range and avoid clamping
 	float rOff = 0.0f;
 	float gOff = 0.0f;
 	float bOff = 0.0f;
+
+	//adds offset and divides by orbit distance / min distance for max lighting
+	//distanceFactor = m_OrbitDistance / min distance - should be one below min;
+	float distanceFactor = 0.1f;
+
 	switch (parentColor) {
 	case StarColor::RED_DWARF:
-		rOff = 0.2f;
-		bOff = -0.04f;
+		distanceFactor = orbitDistance / 2000.0f;
+		if (distanceFactor < 1) {
+			distanceFactor = 1;
+		}
+		rOff = 0.30f / distanceFactor;
 		break;
 	case StarColor::SOLAR:
-		rOff = 0.11f;
-		gOff = 0.15f;
-		bOff = 0.03f;
+		distanceFactor = orbitDistance / 5000.0f;
+		if (distanceFactor < 1) {
+			distanceFactor = 1;
+		}
+		rOff = 0.21f / distanceFactor;
+		gOff = 0.25f / distanceFactor;
+		bOff = 0.13f / distanceFactor;
 		break;
 	case StarColor::RED_GIANT:
-		rOff = 0.27f;
-		gOff = 0.02f;
-		bOff = -0.11f;
+		distanceFactor = orbitDistance / 8000.0f;
+		if (distanceFactor < 1) {
+			distanceFactor = 1;
+		}
+		rOff = 0.35f / distanceFactor;
+		gOff = 0.12f / distanceFactor;
 		break;
 	case StarColor::BLUE_GIANT:
-		rOff = -0.02f;
-		gOff = 0.01f;
-		bOff = 0.33f;
+		distanceFactor = orbitDistance / 10000.0f;
+		if (distanceFactor < 1) {
+			distanceFactor = 1;
+		}
+		gOff = 0.11f / distanceFactor;
+		bOff = 0.35f / distanceFactor;
 		break;
 	}
 
-	ColorShape(&m_Orbital, r + rOff, g + gOff, b + bOff, Shape::CIRCLE);
+	//color with brighter values
+	ColorShape(orbital, r + rOff, g + gOff, b + bOff, Shape::CIRCLE);
 
-	//color first 32 vertices, then rotate by angle degrees
+	//color first 32 vertices in base color
 	for (int i = 1; i < 33; i++) {
-		ColorShapeVertex(&m_Orbital, i, r - 0.06f, g - 0.1f, b - 0.08f, Shape::CIRCLE);
+		ColorShapeVertex(orbital, i, r, g, b, Shape::CIRCLE);
 	}
-	
-	//rotate planet relative to star
-	RotateShape(&m_Orbital, m_RotationX, m_RotationY, m_Angle, Shape::CIRCLE);
 }
 
 void Planet::update(double deltaTime) {
@@ -334,5 +391,37 @@ void Planet::update(double deltaTime) {
 	//set location
 	m_XPos = tempX1 + m_RotationX;
 	m_YPos = tempY1 + m_RotationY;
-	EngineLog(m_XPos, m_YPos);
+}
+
+PlanetType ReturnRandomPlanet() 
+{
+	int random = rand() % PLANET_MAX_PROBABILITY;
+
+	//must be in order
+	if (random < s_PlanetProbabilities.BLUE_ROCKY) {
+		return PlanetType::BLUE_ROCKY;
+	}
+	else if (random < s_PlanetProbabilities.RED_ROCKY) {
+		return PlanetType::RED_ROCKY;
+	}
+	else if (random < s_PlanetProbabilities.GREEN_ROCKY) {
+		return PlanetType::GREEN_ROCKY;
+	}
+	else if (random < s_PlanetProbabilities.GREY_ROCKY) {
+		return PlanetType::GREY_ROCKY;
+	}
+	else if (random < s_PlanetProbabilities.BLUE_GAS) {
+		return PlanetType::BLUE_GAS;
+	}
+	else if (random < s_PlanetProbabilities.RED_GAS) {
+		return PlanetType::RED_GAS;
+	}
+	else if (random < s_PlanetProbabilities.GREEN_GAS) {
+		return PlanetType::GREEN_GAS;
+	}
+	else if (random < s_PlanetProbabilities.YELLOW_GAS) {
+		return PlanetType::YELLOW_GAS;
+	}
+	//defaults to
+	return PlanetType::BLUE_ROCKY;
 }
