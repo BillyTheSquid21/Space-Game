@@ -22,6 +22,7 @@ public:
 
 	//kinematics
 	void accelerate(float a);
+	void accelerate(float a, float angle);
 	void brake(double deltaTime);
 
 	//getters - travel direction adds 90 degrees for consistency
@@ -36,6 +37,7 @@ private:
 	float m_VelocityX = 0.0f;
 	float m_VelocityY = 10.0f;
 	float m_MaxSpeed = 8000.0f;
+	void accelerateVelocity(float newVelocityX, float newVelocityY);
 
 	//current chunk
 	ChunkLocation m_CurrentChunk = { 0, 0 };

@@ -151,6 +151,7 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\SGPhysics.cpp" />
     <ClCompile Include="src\SGUtil.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\ShapeFactory.cpp" />
@@ -164,12 +165,12 @@
     <ClInclude Include="include\GameObject.h" />
     <ClInclude Include="include\ObjectManagement.h" />
     <ClInclude Include="include\Renderer.h" />
+    <ClInclude Include="include\SGPhysics.h" />
     <ClInclude Include="include\SGUtil.h" />
     <ClInclude Include="include\ShapeFactory.h" />
     <ClInclude Include="include\SpaceGame.h" />
     <ClInclude Include="include\SpaceGameObjects.h" />
     <ClInclude Include="include\World.h" />
-    <ClInclude Include="SGPhysics.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Default.shader" />

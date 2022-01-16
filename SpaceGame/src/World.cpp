@@ -299,14 +299,20 @@ void World::render() {
 }
 
 void World::update(double deltaTime) {
+
 	//update stars
 	for (int i = 0; i < m_StarsList.size(); i++) {
 		m_StarsList[i].update(deltaTime);
 	}
-	//update planets
+
+	//update planets and find closest to ship
+	Planet* closestPlanet = nullptr;
+	float closestPlanetDistance = 1000000.0f;
 	for (int i = 0; i < m_PlanetsList.size(); i++) {
+		//update planet
 		m_PlanetsList[i].update(deltaTime);
 	}
+
 }
 
 void World::generateSolarSystem(int x, int y, Chunk& chunk) {
@@ -335,7 +341,7 @@ void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 		chunk.assignObjectToChunk(starObject.pointer);
 
 		//create up to 9 planets
-		int planetCount = 9;
+		int planetCount = (rand() % 9) + 1;
 		float distanceFromStar = GetRandomOrbitDistance(starObject.type());
 		//make each planet, incrementing orbit distance
 		for (int i = 0; i < planetCount; i++) {

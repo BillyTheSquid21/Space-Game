@@ -47,7 +47,7 @@ void SpaceGame::update(double deltaTime) {
 		m_Ship.rotate(-8.0f * deltaTime);
 	}
 	if (HELD_W) {
-		m_Ship.accelerate(1200.0f * deltaTime);
+		m_Ship.accelerate(2200.0f * deltaTime);
 	}
 	if (HELD_SPACE) {
 		m_Ship.brake(deltaTime);

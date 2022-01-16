@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include "SpaceGameObjects.h"
 #include "Chunk.h"
+#include "SGPhysics.h"
 
 class World
 {

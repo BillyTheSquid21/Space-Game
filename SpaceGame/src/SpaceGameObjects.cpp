@@ -27,9 +27,7 @@ void Ship::update(double deltaTime) {
 	m_CurrentChunk = LocateChunk(m_XPos, m_YPos);
 }
 
-void Ship::accelerate(float a) {
-	float newVelocityX = m_VelocityX + a * -sin(m_CumulativeAngle);
-	float newVelocityY = m_VelocityY + a * cos(m_CumulativeAngle);
+void Ship::accelerateVelocity(float newVelocityX, float newVelocityY) {
 	float magnitudeSpeed = sqrt((newVelocityX * newVelocityX) + (newVelocityY * newVelocityY));
 	//Make sure speed isn't excessive
 	if (magnitudeSpeed <= m_MaxSpeed) {
@@ -38,9 +36,21 @@ void Ship::accelerate(float a) {
 	}
 }
 
+void Ship::accelerate(float a) {
+	float newVelocityX = m_VelocityX + a * -sin(m_CumulativeAngle);
+	float newVelocityY = m_VelocityY + a * cos(m_CumulativeAngle);
+	accelerateVelocity(newVelocityX, newVelocityY); //easier for consistency in overloading
+}
+
+void Ship::accelerate(float a, float angle) {
+	float newVelocityX = m_VelocityX + a * -sin(angle);
+	float newVelocityY = m_VelocityY + a * cos(angle);
+	accelerateVelocity(newVelocityX, newVelocityY);
+}
+
 void Ship::brake(double deltaTime) {
-	float newVelocityX = m_VelocityX + - (m_VelocityX * deltaTime);
-	float newVelocityY = m_VelocityY + - (m_VelocityY * deltaTime);
+	float newVelocityX = m_VelocityX + - (2 * m_VelocityX * deltaTime);
+	float newVelocityY = m_VelocityY + - (2 * m_VelocityY * deltaTime);
 	float magnitudeSpeed = sqrt((newVelocityX * newVelocityX) + (newVelocityY * newVelocityY));
 	//Make sure speed isn't excessive
 	if (magnitudeSpeed <= m_MaxSpeed) {
@@ -438,19 +448,10 @@ void ColorPlanet(PlanetType type, StarType parentColor, void* orbital, float orb
 void Planet::update(double deltaTime) {
 	m_Angle += deltaTime * m_Velocity;
 	RotateShape(&m_Orbital, m_RotationX, m_RotationY, deltaTime * m_Velocity, Shape::CIRCLE);
-	
-	//update xPos and yPos from cumulative
-	//Make relative to centre
-	float x1 = m_XPos - m_RotationX;
-	float y1 = m_YPos - m_RotationY;
 
-	//Apply rotation
-	float tempX1 = x1 * cos(m_Angle) - y1 * sin(m_Angle);
-	float tempY1 = x1 * sin(m_Angle) + y1 * cos(m_Angle);
-
-	//set location
-	m_XPos = tempX1 + m_RotationX;
-	m_YPos = tempY1 + m_RotationY;
+	//set location from orbital centre
+	m_XPos = m_Orbital[0].position.a;
+	m_YPos = m_Orbital[0].position.b;
 }
 
 PlanetType ReturnRandomPlanet() 
