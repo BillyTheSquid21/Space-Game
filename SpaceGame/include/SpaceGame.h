@@ -26,7 +26,7 @@ private:
 	Ship m_Ship;
 
 	//keeps track of persistent held input
-	bool m_HeldInput[3];
+	bool m_HeldInput[4];
 
 	//zoom level for transforming transformations
 	float m_ZoomLevel = 1.0f;
@@ -41,5 +41,6 @@ private:
 #define HELD_Q m_HeldInput[0]
 #define HELD_E m_HeldInput[1]
 #define HELD_W m_HeldInput[2]
+#define HELD_SPACE m_HeldInput[3]
 
 #endif

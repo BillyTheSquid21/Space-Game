@@ -200,10 +200,10 @@ public:
 	bool isInBounds(const void* vert, unsigned int vertSize);
 	
 	//static indices - some indices are standard and will not change
-	static const unsigned int s_TriIndices[];
-	static const unsigned int s_QuadIndices[];
-	static const unsigned int s_LineIndices[];
-	static const unsigned int s_CircleIndices[];
+	static const unsigned int s_Tri_I[];
+	static const unsigned int s_Quad_I[];
+	static const unsigned int s_Line_I[];
+	static const unsigned int s_Circle_I[];
 
 	//static indices sizes
 	static const unsigned short int IND_TRI = 3;

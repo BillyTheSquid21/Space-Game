@@ -13,8 +13,8 @@ Chunk::Chunk(int x, int y, Renderer* ren)
 
 void Chunk::makeGrid() {
 	//create grid
-	l1 = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + CHUNK_TO_WORLD_FACTOR, 1.4f);
-	l2 = CreateLine(m_XPos, m_YPos, m_XPos + CHUNK_TO_WORLD_FACTOR, m_YPos, 1.4f);
+	l1 = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + CHUNK_TO_WORLD_FACTOR, 3.4f);
+	l2 = CreateLine(m_XPos, m_YPos, m_XPos + CHUNK_TO_WORLD_FACTOR, m_YPos, 3.4f);
 	LayerShape(&l1, LAYER_1, Shape::LINE);
 	LayerShape(&l2, LAYER_1, Shape::LINE);
 }
@@ -22,12 +22,12 @@ void Chunk::makeGrid() {
 void Chunk::render() {
 	if (m_Renderer->isInBounds(&l1, GetVerticesCount(Shape::LINE))) {
 		Renderer::commitPrimitive(&l1, GetElementCount(Shape::LINE),
-			Renderer::s_LineIndices, Renderer::IND_LINE);
+			Renderer::s_Line_I, Renderer::IND_LINE);
 	}
 
 	if (m_Renderer->isInBounds(&l2, GetVerticesCount(Shape::LINE))) {
 		Renderer::commitPrimitive(&l2, GetElementCount(Shape::LINE),
-			Renderer::s_LineIndices, Renderer::IND_LINE);
+			Renderer::s_Line_I, Renderer::IND_LINE);
 	}
 }
 

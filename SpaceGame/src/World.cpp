@@ -1,10 +1,13 @@
 #include "World.h"
 
 //world
-void World::init() {
+void World::init(Ship* player) {
 	//allocate vector
 	m_ChunkList.resize(CHUNK_CYCLES_TOTAL);
 	m_ChunkIDCache.resize(CHUNK_CYCLES_TOTAL);
+
+	//set pointer for player
+	m_PlayerPointer = player;
 }
 
 void World::setRenderer(Renderer* ren) {
@@ -134,7 +137,7 @@ void World::loadChunkObjects(Chunk& chunk) {
 			//and is assigned to the same chunk and NEVER DEASSIGNED
 			//if it fails it'll just look weird
 			index = chunk.chunkObjects()[i].index;
-			Planet planet = Planet(m_PlanetsInstructionsList[chunk.chunkObjects()[i].index], m_StarsList[m_StarsList.size() - 1].m_Temperature, index);
+			Planet planet = Planet(m_PlanetsInstructionsList[chunk.chunkObjects()[i].index], m_StarsList[m_StarsList.size() - 1].type(), index);
 			m_PlanetsList.push_back(planet);
 		}
 		break;
@@ -309,47 +312,17 @@ void World::update(double deltaTime) {
 void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 	//have chance of creating star - planets are bound to origin chunk
 	int random = (rand() % 2000) + 1;
-	if (random < 1500) {
+	if (random < 400) {
 
 		StarInfo starInfo = {};
 
 		//pick type
-		int type = (rand() % 20);
-		StarColor temp = StarColor::RED_DWARF;
-		if (type < 8) {
-			temp = StarColor::RED_DWARF;
-		}
-		else if (type >= 8 && type < 13) {
-			temp = StarColor::SOLAR;
-		}
-		else if (type >= 13 && type < 17) {
-			temp = StarColor::RED_GIANT;
-		}
-		else if (type >= 17 && type <= 20) {
-			temp = StarColor::BLUE_GIANT;
-		}
+		StarType type = ReturnRandomStar();
 
 		//pick mass
-		float mass = 0.0f;
-		switch (temp) {
-		case StarColor::RED_DWARF :
-			mass = (float)(rand() % 60) + 30.0f;
-			break;
-		case StarColor::SOLAR:
-			mass = (float)(rand() % 100) + 80.0f;
-			break;
-		case StarColor::RED_GIANT:
-			mass = (float)(rand() % 130) + 130.0f;
-			break;
-		case StarColor::BLUE_GIANT:
-			mass = (float)(rand() % 300) + 180.0f;
-			break;
-		default:
-			mass = 100.0f;
-			break;
-		}
+		float mass = GetRandomStarMass(type);
 
-		starInfo = { x * CHUNK_TO_WORLD_FACTOR, y * CHUNK_TO_WORLD_FACTOR, mass, temp };
+		starInfo = { x * CHUNK_TO_WORLD_FACTOR, y * CHUNK_TO_WORLD_FACTOR, mass, type };
 
 		//add to star list
 		Star starObject = Star(starInfo, m_StarsInstructionsList.size());
@@ -362,30 +335,12 @@ void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 		chunk.assignObjectToChunk(starObject.pointer);
 
 		//create up to 9 planets
-		int planetCount = (rand() % 9) + 1;
-		float distanceFromStar = 0.0f;
-		switch (starObject.m_Temperature) 
-		{
-		case StarColor::RED_DWARF:
-			distanceFromStar = MINIMUM_ORBIT_RED_DWARF + (rand() % 200);
-			break;
-		case StarColor::SOLAR:
-			distanceFromStar = MINIMUM_ORBIT_SOLAR + (rand() % 200);;
-			break;
-		case StarColor::RED_GIANT:
-			distanceFromStar = MINIMUM_ORBIT_RED_GIANT + (rand() % 200);
-			break;
-		case StarColor::BLUE_GIANT:
-			distanceFromStar = MINIMUM_ORBIT_BLUE_GIANT + (rand() % 200);;
-			break;
-		default:
-			distanceFromStar = MINIMUM_ORBIT_RED_DWARF + (rand() % 200);;
-			break;
-		}
+		int planetCount = 9;
+		float distanceFromStar = GetRandomOrbitDistance(starObject.type());
 		//make each planet, incrementing orbit distance
 		for (int i = 0; i < planetCount; i++) {
 			generatePlanet(&starObject, chunk, distanceFromStar);
-			distanceFromStar += (rand() % 2000) + 1000.0f;
+			distanceFromStar += (rand() % 2200) + 4800.0f;
 		}
 
 		m_GenStar = false;
@@ -410,15 +365,15 @@ void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance)
 		mass = (float)(rand() % 55) + 30.0f;
 	}
 
-	//randomise angle - approx 2pi in int form although will have bias to near 0 deg
-	angle = (float)(rand() % 62831) / 10000.0f;
+	//make angle facing away from player - means planets wont suddenly pop in in front of player
+	angle = m_PlayerPointer->direction();
 
 	//randomise velocity - between 0.5 units and 10
 	velocity = ((float)(rand() % 100000) / 100000.0f) + 0.00001f;
 
 	//assign and push
 	PlanetInfo planetInfo = { mass, angle, velocity, type, parent->xPos(), parent->yPos(), orbitDistance };
-	Planet planetObject = Planet(planetInfo, parent->m_Temperature, m_PlanetsInstructionsList.size());
+	Planet planetObject = Planet(planetInfo, parent->type(), m_PlanetsInstructionsList.size());
 	chunk.assignObjectToChunk(planetObject.pointer);
 	m_PlanetsList.push_back(planetObject);
 	m_PlanetsInstructionsList.push_back(planetInfo);

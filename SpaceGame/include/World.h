@@ -13,7 +13,7 @@ public:
 	World() = default;
 	~World() = default;
 
-	void init();
+	void init(Ship* player);
 
 	//set renderer
 	void setRenderer(Renderer* ren);
@@ -29,6 +29,8 @@ public:
 
 private:
 	Renderer* m_Renderer;
+
+	Ship* m_PlayerPointer = nullptr;
 
 	//loads and unloads objects
 	void unloadChunkObjects(Chunk& chunk);

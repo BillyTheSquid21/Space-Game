@@ -22,8 +22,11 @@ public:
 
 	//kinematics
 	void accelerate(float a);
+	void brake(double deltaTime);
 
-	//location
+	//getters - travel direction adds 90 degrees for consistency
+	float direction() const { return m_CumulativeAngle; }
+	float travelDirection() const { return atan(m_VelocityX / m_VelocityY); }
 	ChunkLocation location() const { return m_CurrentChunk; }
 
 private:
@@ -82,14 +85,33 @@ protected:
 };
 
 //Star
-enum class StarColor {
+enum class StarType {
 	RED_DWARF, SOLAR, RED_GIANT, BLUE_GIANT
 };
 
 //Struct to provide info to rebuild star
 struct StarInfo {
-	float x; float y; float mass; StarColor temp;
+	float x; float y; float mass; StarType temp;
 };
+
+//Star probabilities
+const int STAR_MAX_PROBABILITY = 1000;
+struct StarProbability
+{
+	//all have a range within max - if random num lands between
+	unsigned int RED_DWARF = 400;
+	unsigned int SOLAR = 650;
+	unsigned int RED_GIANT = 850;
+	unsigned int BLUE_GIANT = STAR_MAX_PROBABILITY;
+};
+
+//stores probabilities
+static StarProbability s_StarProbabilities;
+
+//Star randomisation functions to add some spice
+StarType ReturnRandomStar();
+float GetRandomStarMass(StarType type);
+float GetRandomOrbitDistance(StarType type);
 
 class Star : public Orbital
 {
@@ -104,7 +126,7 @@ public:
 
 	//unload - returns info to update
 	StarInfo unload() const { return {m_XPos, m_YPos, m_Mass, m_Temperature}; }
-	StarColor m_Temperature;
+	StarType type() const { return m_Temperature; }
 
 private:
 	//initial red
@@ -117,6 +139,7 @@ private:
 	bool redUp = true;
 	bool blueUp = false;
 
+	StarType m_Temperature;
 	Circle m_Light;
 };
 
@@ -141,14 +164,14 @@ const int PLANET_MAX_PROBABILITY = 2000;
 struct PlanetProbability
 {	
 	//all have a range within max - if random num lands between
-	unsigned int BLUE_ROCKY = 0;
-	unsigned int RED_ROCKY = 250;
-	unsigned int GREEN_ROCKY = 500;
-	unsigned int GREY_ROCKY = 650;
-	unsigned int BLUE_GAS = 1000;
-	unsigned int RED_GAS = 1350;
-	unsigned int GREEN_GAS = 1700;
-	unsigned int YELLOW_GAS = 1900;
+	unsigned int BLUE_ROCKY = 250;
+	unsigned int RED_ROCKY = 600;
+	unsigned int GREEN_ROCKY = 700;
+	unsigned int GREY_ROCKY = 1000;
+	unsigned int BLUE_GAS = 1300;
+	unsigned int RED_GAS = 1600;
+	unsigned int GREEN_GAS = 1900;
+	unsigned int YELLOW_GAS = PLANET_MAX_PROBABILITY;
 };
 
 //stores probabilities
@@ -158,13 +181,13 @@ static PlanetProbability s_PlanetProbabilities;
 PlanetType ReturnRandomPlanet(); 
 
 //colors planet - contains data for how to
-void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float orbitDistance);
+void ColorPlanet(PlanetType type, StarType parentColor, void* orbital, float orbitDistance);
 
 class Planet : public Orbital
 {
 public:
 	using Orbital::Orbital;
-	Planet(PlanetInfo planet, StarColor parentColor, unsigned int index);
+	Planet(PlanetInfo planet, StarType parentColor, unsigned int index);
 
 	void update(double deltaTime);
 	PlanetInfo unload() const { return {m_Mass, m_Angle, m_Velocity, m_Type, m_RotationX, m_RotationY, m_OrbitDistance}; }

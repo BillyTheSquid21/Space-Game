@@ -432,24 +432,24 @@ void Renderer::draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 }
 
 //constant indices for a given supported shape
-const unsigned int Renderer::s_TriIndices[] =
+const unsigned int Renderer::s_Tri_I[] =
 {
 	0, 1, 2
 };
 
-const unsigned int Renderer::s_QuadIndices[] =
+const unsigned int Renderer::s_Quad_I[] =
 {
 	0, 1, 2,
 	2, 3, 0
 };
 
-const unsigned int Renderer::s_LineIndices[] =
+const unsigned int Renderer::s_Line_I[] =
 {
 	0, 1, 2,
 	2, 3, 0
 };
 
-const unsigned int Renderer::s_CircleIndices[] =
+const unsigned int Renderer::s_Circle_I[] =
 {
 	0, 1, 2,
 	0, 2, 3,

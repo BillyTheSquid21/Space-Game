@@ -4,11 +4,11 @@ bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback 
 	bool initSuccess = Game::init(name, kCallback, sCallback);
 
 	//create ship
-	m_Ship = Ship(70.0f);
+	m_Ship = Ship(100.0f);
 	m_Ship.setRenderer(&m_Renderer);
 
 	//init world
-	m_World.init();
+	m_World.init(&m_Ship);
 	m_World.setRenderer(&m_Renderer);
 	m_World.initialGenerateChunks();
 
@@ -47,7 +47,10 @@ void SpaceGame::update(double deltaTime) {
 		m_Ship.rotate(-8.0f * deltaTime);
 	}
 	if (HELD_W) {
-		m_Ship.accelerate(600.0f * deltaTime);
+		m_Ship.accelerate(1200.0f * deltaTime);
+	}
+	if (HELD_SPACE) {
+		m_Ship.brake(deltaTime);
 	}
 	m_Ship.update(deltaTime);
 
@@ -67,11 +70,21 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 	Game::handleInput(key, scancode, action, mods);
 
 	//put single button directly in here
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
 		m_Ship.resetRotation();
+		m_Ship.rotate(-m_Ship.travelDirection());
 	}
 
 	//held input
+	if (key == GLFW_KEY_SPACE) {
+		if (action == GLFW_PRESS) {
+			HELD_SPACE = true;
+		}
+		else if (action == GLFW_RELEASE) {
+			HELD_SPACE = false;
+		}
+	}
+
 	if (key == GLFW_KEY_Q) {
 		if (action == GLFW_PRESS) {
 			HELD_Q = true;
@@ -98,15 +111,14 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 			HELD_W = false;
 		}
 	}
-
 }
 
 void SpaceGame::handleScrolling(double xOffset, double yOffset) {
-	if (yOffset > 0 && m_ZoomLevel < 1.0f) {
+	if (yOffset > 0 && m_ZoomLevel < 0.5f) {
 		m_Renderer.camera.zoomCamera(0.005f);
 		m_ZoomLevel += 0.005f;
 	}
-	else if (yOffset < 0 && m_ZoomLevel > 0.05f) {
+	else if (yOffset < 0 && m_ZoomLevel > 0.025f) {
 		m_Renderer.camera.zoomCamera(-0.005f);
 		m_ZoomLevel += -0.005f;
 	}

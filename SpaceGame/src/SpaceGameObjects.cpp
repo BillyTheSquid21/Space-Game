@@ -2,7 +2,7 @@
 
 //Ship
 Ship::Ship(float size) 
-	: m_Ship{ CreateTri(0.0f, 0.0f, size) }, m_Direction{CreateLine(0.0f,0.0f, 0.0f, 40.0f, 2.0f)}
+	: m_Ship{ CreateTri(0.0f, 0.0f, size) }, m_Direction{CreateLine(0.0f,0.0f, 0.0f, 130.0f, 6.0f)}
 {
 	r = 0.094f;
 	g = 0.584f;
@@ -14,8 +14,8 @@ Ship::Ship(float size)
 }
 
 void Ship::render() {
-	Renderer::commitPrimitive(&m_Ship, GetElementCount(Shape::TRI), Renderer::s_TriIndices, Renderer::IND_TRI);
-	Renderer::commitPrimitive(&m_Direction, GetElementCount(Shape::LINE), Renderer::s_LineIndices, Renderer::IND_LINE);
+	Renderer::commitPrimitive(&m_Ship, GetElementCount(Shape::TRI), Renderer::s_Tri_I, Renderer::IND_TRI);
+	Renderer::commitPrimitive(&m_Direction, GetElementCount(Shape::LINE), Renderer::s_Line_I, Renderer::IND_LINE);
 }
 
 void Ship::update(double deltaTime) {
@@ -30,6 +30,17 @@ void Ship::update(double deltaTime) {
 void Ship::accelerate(float a) {
 	float newVelocityX = m_VelocityX + a * -sin(m_CumulativeAngle);
 	float newVelocityY = m_VelocityY + a * cos(m_CumulativeAngle);
+	float magnitudeSpeed = sqrt((newVelocityX * newVelocityX) + (newVelocityY * newVelocityY));
+	//Make sure speed isn't excessive
+	if (magnitudeSpeed <= m_MaxSpeed) {
+		m_VelocityX = newVelocityX;
+		m_VelocityY = newVelocityY;
+	}
+}
+
+void Ship::brake(double deltaTime) {
+	float newVelocityX = m_VelocityX + - (m_VelocityX * deltaTime);
+	float newVelocityY = m_VelocityY + - (m_VelocityY * deltaTime);
 	float magnitudeSpeed = sqrt((newVelocityX * newVelocityX) + (newVelocityY * newVelocityY));
 	//Make sure speed isn't excessive
 	if (magnitudeSpeed <= m_MaxSpeed) {
@@ -125,7 +136,7 @@ void Ship::DoTheFunky(float dt) {
 
 //Orbitals
 void Orbital::render() {
-	Renderer::commitPrimitive(&m_Orbital, GetElementCount(Shape::CIRCLE), &Renderer::s_CircleIndices, Renderer::IND_CIRCLE);
+	Renderer::commitPrimitive(&m_Orbital, GetElementCount(Shape::CIRCLE), &Renderer::s_Circle_I, Renderer::IND_CIRCLE);
 }
 
 //Star
@@ -151,7 +162,7 @@ Star::Star(StarInfo star, unsigned int index)
 	m_Temperature = star.temp;
 	switch (star.temp) 
 	{
-	case StarColor::RED_DWARF:
+	case StarType::RED_DWARF:
 		m_Red = 0.82f;
 		m_InitialRed = 0.82f;
 		m_Green = 0.14f;
@@ -159,7 +170,7 @@ Star::Star(StarInfo star, unsigned int index)
 		m_InitialBlue = 0.22f;
 		break;
 
-	case StarColor::SOLAR:
+	case StarType::SOLAR:
 		m_Red = 0.84f;
 		m_InitialRed = 0.84f;
 		m_Green = 0.73f;
@@ -167,7 +178,7 @@ Star::Star(StarInfo star, unsigned int index)
 		m_InitialBlue = 0.42f;
 		break;
 
-	case StarColor::RED_GIANT:
+	case StarType::RED_GIANT:
 		m_Red = 0.84f;
 		m_InitialRed = 0.84f;
 		m_Green = 0.13f;
@@ -175,7 +186,7 @@ Star::Star(StarInfo star, unsigned int index)
 		m_InitialBlue = 0.02f;
 		break;
 
-	case StarColor::BLUE_GIANT:
+	case StarType::BLUE_GIANT:
 		m_Red = 0.34f;
 		m_InitialRed = 0.34f;
 		m_Green = 0.20f;
@@ -231,14 +242,63 @@ void Star::update(double deltaTime) {
 
 void Star::render() {
 
-	Renderer::commitPrimitive(&m_Light, GetElementCount(Shape::CIRCLE), Renderer::s_CircleIndices, Renderer::IND_CIRCLE);
+	Renderer::commitPrimitive(&m_Light, GetElementCount(Shape::CIRCLE), Renderer::s_Circle_I, Renderer::IND_CIRCLE);
 
 	//inherited
 	Orbital::render();
 }
 
+StarType ReturnRandomStar() {
+	int random = rand() % STAR_MAX_PROBABILITY;
+
+	//must be in order
+	if (random < s_StarProbabilities.RED_DWARF) {
+		return StarType::RED_DWARF;
+	}
+	else if (random < s_StarProbabilities.SOLAR) {
+		return StarType::SOLAR;
+	}
+	else if (random < s_StarProbabilities.RED_GIANT) {
+		return StarType::RED_GIANT;
+	}
+	else if (random < s_StarProbabilities.BLUE_GIANT) {
+		return StarType::BLUE_GIANT;
+	}
+	//defaults to
+	return StarType::RED_DWARF;
+}
+
+float GetRandomStarMass(StarType type) {
+	switch (type) {
+	case StarType::RED_DWARF:
+		return (float)(rand() % 60) + 30.0f;
+	case StarType::SOLAR:
+		return (float)(rand() % 100) + 80.0f;
+	case StarType::RED_GIANT:
+		return (float)(rand() % 130) + 130.0f;
+	case StarType::BLUE_GIANT:
+		return (float)(rand() % 300) + 180.0f;
+	}
+	return 100.0f; //default
+}
+
+float GetRandomOrbitDistance(StarType type) {
+	switch (type)
+	{
+	case StarType::RED_DWARF:
+		return MINIMUM_ORBIT_RED_DWARF + (rand() % 200);
+	case StarType::SOLAR:
+		return MINIMUM_ORBIT_SOLAR + (rand() % 200);
+	case StarType::RED_GIANT:
+		return MINIMUM_ORBIT_RED_GIANT + (rand() % 200);
+	case StarType::BLUE_GIANT:
+		return MINIMUM_ORBIT_BLUE_GIANT + (rand() % 200);
+	}
+	return MINIMUM_ORBIT_RED_DWARF; //default
+}
+
 //Planets
-Planet::Planet(PlanetInfo planet, StarColor parentColor, unsigned int index) {
+Planet::Planet(PlanetInfo planet, StarType parentColor, unsigned int index) {
 	//set pointer
 	pointer = { ObjectType::Planet, index };
 
@@ -269,7 +329,7 @@ Planet::Planet(PlanetInfo planet, StarColor parentColor, unsigned int index) {
 }
 
 //Colors planets with lighting depending on parent star - all decided on creation and not modified
-void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float orbitDistance) {
+void ColorPlanet(PlanetType type, StarType parentColor, void* orbital, float orbitDistance) {
 	//setup color - keep base color <= 0.65 to avoid clamping - and to keep dark
 	float r = 0.0f;
 	float g = 0.0f;
@@ -332,14 +392,14 @@ void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float or
 	float distanceFactor = 0.1f;
 
 	switch (parentColor) {
-	case StarColor::RED_DWARF:
+	case StarType::RED_DWARF:
 		distanceFactor = orbitDistance / MINIMUM_ORBIT_RED_DWARF;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;
 		}
 		rOff = 0.30f / distanceFactor;
 		break;
-	case StarColor::SOLAR:
+	case StarType::SOLAR:
 		distanceFactor = orbitDistance / MINIMUM_ORBIT_SOLAR;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;
@@ -348,7 +408,7 @@ void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float or
 		gOff = 0.25f / distanceFactor;
 		bOff = 0.13f / distanceFactor;
 		break;
-	case StarColor::RED_GIANT:
+	case StarType::RED_GIANT:
 		distanceFactor = orbitDistance / MINIMUM_ORBIT_RED_GIANT;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;
@@ -356,7 +416,7 @@ void ColorPlanet(PlanetType type, StarColor parentColor, void* orbital, float or
 		rOff = 0.35f / distanceFactor;
 		gOff = 0.12f / distanceFactor;
 		break;
-	case StarColor::BLUE_GIANT:
+	case StarType::BLUE_GIANT:
 		distanceFactor = orbitDistance / MINIMUM_ORBIT_BLUE_GIANT;
 		if (distanceFactor < 1) {
 			distanceFactor = 1;

@@ -5,8 +5,8 @@
 #include "Renderer.h"
 #include "ObjectManagement.h"
 
-const float CHUNK_TO_WORLD_FACTOR = 9820.0f; //2560 coords in 1 chunk
-const unsigned char DRAW_LIMIT = 3;
+const float CHUNK_TO_WORLD_FACTOR = 16384.0f; //2560 coords in 1 chunk
+const unsigned char DRAW_LIMIT = 5;
 
 //Keeps track of how many chunks are generated in one cycle
 constexpr unsigned int CHUNK_CYCLES_TOTAL = ((DRAW_LIMIT * 2) - 1) * ((DRAW_LIMIT * 2) - 1);
@@ -45,7 +45,7 @@ public:
 	//provide read only access to objects
 	const ObjectPointer* chunkObjects() const { return m_ChunkObjects; }
 
-	static const unsigned char s_OBJECT_COUNT = 16;
+	static const unsigned char s_OBJECT_COUNT = 24;
 
 private:
 	Line l1;
@@ -56,6 +56,8 @@ private:
 	//Chunks contain x many slots for object pointers - 16 right now
 	ObjectPointer m_ChunkObjects[s_OBJECT_COUNT] = 
 	{
+		NULL_OBJECT, NULL_OBJECT, NULL_OBJECT, NULL_OBJECT,
+		NULL_OBJECT, NULL_OBJECT, NULL_OBJECT, NULL_OBJECT,
 		NULL_OBJECT, NULL_OBJECT, NULL_OBJECT, NULL_OBJECT,
 		NULL_OBJECT, NULL_OBJECT, NULL_OBJECT, NULL_OBJECT,
 		NULL_OBJECT, NULL_OBJECT, NULL_OBJECT, NULL_OBJECT,
