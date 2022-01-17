@@ -15,3 +15,16 @@ Force CalculateGravity(float x1, float y1, float x2, float y2, float mass) {
 
 	return { SG_PHYS_G * mass / (distance), direction};
 }
+
+bool CircleCollision(void* polygon, unsigned int verticeCount, float xCircle, float yCircle, float radius) {
+	Vertex* verticePointer = (Vertex*)polygon;
+	//if any vertice is within radius, has collided
+	for (int i = 0; i < verticeCount; i++) {
+		float distance = CalculateDistance(verticePointer[i].position.a, verticePointer[i].position.b,
+			xCircle, yCircle);
+		if (distance < radius) {
+			return true;
+		}
+	}
+	return false;
+}

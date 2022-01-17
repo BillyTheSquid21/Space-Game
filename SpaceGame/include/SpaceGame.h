@@ -38,8 +38,8 @@ private:
 };
 
 //define where in array held persist is kept
-#define HELD_Q m_HeldInput[0]
-#define HELD_E m_HeldInput[1]
+#define HELD_A m_HeldInput[0]
+#define HELD_D m_HeldInput[1]
 #define HELD_W m_HeldInput[2]
 #define HELD_SPACE m_HeldInput[3]
 #define HELD_SHIFT m_HeldInput[4]

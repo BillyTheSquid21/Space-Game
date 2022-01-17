@@ -40,11 +40,11 @@ void SpaceGame::update(double deltaTime) {
 	//update position and things here
 
 	//ship
-	if (HELD_Q) {
-		m_Ship.rotate(8.0f * deltaTime);
+	if (HELD_A) {
+		m_Ship.rotate(6.0f * deltaTime);
 	}
-	if (HELD_E) {
-		m_Ship.rotate(-8.0f * deltaTime);
+	if (HELD_D) {
+		m_Ship.rotate(-6.0f * deltaTime);
 	}
 	if (HELD_W) {
 		m_Ship.accelerate(2200.0f * deltaTime);
@@ -90,21 +90,21 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 		}
 	}
 
-	if (key == GLFW_KEY_Q) {
+	if (key == GLFW_KEY_A) {
 		if (action == GLFW_PRESS) {
-			HELD_Q = true;
+			HELD_A = true;
 		}
 		else if (action == GLFW_RELEASE) {
-			HELD_Q = false;
+			HELD_A = false;
 		}
 	}
 
-	if (key == GLFW_KEY_E) {
+	if (key == GLFW_KEY_D) {
 		if (action == GLFW_PRESS) {
-			HELD_E = true;
+			HELD_D = true;
 		}
 		else if (action == GLFW_RELEASE) {
-			HELD_E = false;
+			HELD_D = false;
 		}
 	}
 

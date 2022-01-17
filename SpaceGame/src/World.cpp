@@ -307,6 +307,13 @@ void World::update(double deltaTime) {
 		//update star
 		m_StarsList[i].update(deltaTime);
 
+		//Check if collision has happened
+		if (CircleCollision(m_PlayerPointer->triangle(), GetVerticesCount(Shape::TRI),
+			m_StarsList[i].xPos(), m_StarsList[i].yPos(), m_StarsList[i].radius())) {
+			
+			//do collision here
+		}
+
 		//see what star is closest
 		float distance = CalculateDistance(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
 			m_StarsList[i].xPos(), m_StarsList[i].yPos());
@@ -322,6 +329,13 @@ void World::update(double deltaTime) {
 	for (int i = 0; i < m_PlanetsList.size(); i++) {
 		//update planet
 		m_PlanetsList[i].update(deltaTime);
+
+		//Check if collision has happened
+		if (CircleCollision(m_PlayerPointer->triangle(), GetVerticesCount(Shape::TRI),
+			m_StarsList[i].xPos(), m_PlanetsList[i].yPos(), m_PlanetsList[i].radius())) {
+
+			//do collision here
+		}
 
 		//see what planet is closest
 		float distance = CalculateDistance(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),

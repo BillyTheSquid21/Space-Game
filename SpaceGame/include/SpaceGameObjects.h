@@ -29,6 +29,7 @@ public:
 	float direction() const { return m_CumulativeAngle; }
 	float travelDirection() const { return atan(m_VelocityX / m_VelocityY); }
 	ChunkLocation location() const { return m_CurrentChunk; }
+	Tri* triangle() { return &m_Ship; }
 
 private:
 
@@ -73,6 +74,11 @@ public:
 
 	//Pointer
 	ObjectPointer pointer = NULL_OBJECT;
+
+	//Circle for collision
+	Circle circle() const { return m_Orbital; }
+
+	float radius() const { return m_Radius; }
 
 protected:
 	//Radius and Mass
