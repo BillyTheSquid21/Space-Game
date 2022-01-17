@@ -91,7 +91,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\Default.shader">
+    <None Include="res\shaders\Default.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -65,7 +65,7 @@ bool Game::init(const char name[], Key_Callback kCallback, Scroll_Callback sCall
     m_Renderer.init((float)m_Width, (float)m_Height);
     
     //shaders
-    m_ShaderProgram.create("res/shaders/Default.shader");
+    m_ShaderProgram.create("res/shaders/Default.glsl");
     m_ShaderProgram.bind();
     m_ShaderProgram.unbind();
 
