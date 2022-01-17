@@ -41,10 +41,10 @@ void Ship::accelerate(float a) {
 	float newVelocityY = m_VelocityY + a * cos(m_CumulativeAngle);
 	accelerateVelocity(newVelocityX, newVelocityY); //easier for consistency in overloading
 }
-
+//when an angle is involved, has to be different as is not relative to ship direction
 void Ship::accelerate(float a, float angle) {
-	float newVelocityX = m_VelocityX + a * -sin(angle);
-	float newVelocityY = m_VelocityY + a * cos(angle);
+	float newVelocityX = m_VelocityX + a * cos(angle);
+	float newVelocityY = m_VelocityY + a * sin(angle);
 	accelerateVelocity(newVelocityX, newVelocityY);
 }
 

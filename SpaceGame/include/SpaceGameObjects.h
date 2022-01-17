@@ -36,7 +36,7 @@ private:
 	float m_CumulativeAngle = 0.0f;
 	float m_VelocityX = 0.0f;
 	float m_VelocityY = 10.0f;
-	float m_MaxSpeed = 8000.0f;
+	float m_MaxSpeed = 10000.0f;
 	void accelerateVelocity(float newVelocityX, float newVelocityY);
 
 	//current chunk

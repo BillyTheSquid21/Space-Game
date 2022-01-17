@@ -301,8 +301,19 @@ void World::render() {
 void World::update(double deltaTime) {
 
 	//update stars
+	Star* closestStar = nullptr;
+	float closestStarDistance = 1000000.0f;
 	for (int i = 0; i < m_StarsList.size(); i++) {
+		//update star
 		m_StarsList[i].update(deltaTime);
+
+		//see what star is closest
+		float distance = CalculateDistance(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
+			m_StarsList[i].xPos(), m_StarsList[i].yPos());
+		if (distance < closestStarDistance) {
+			closestStarDistance = distance;
+			closestStar = &m_StarsList[i];
+		}
 	}
 
 	//update planets and find closest to ship
@@ -311,6 +322,27 @@ void World::update(double deltaTime) {
 	for (int i = 0; i < m_PlanetsList.size(); i++) {
 		//update planet
 		m_PlanetsList[i].update(deltaTime);
+
+		//see what planet is closest
+		float distance = CalculateDistance(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
+			m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos());
+		if (distance < closestPlanetDistance) {
+			closestPlanetDistance = distance;
+			closestPlanet = &m_PlanetsList[i];
+		}
+	}
+
+	//apply gravity for closest planet
+	if (closestPlanet != NULL) {
+		Force gravity = CalculateGravity(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
+			closestPlanet->xPos(), closestPlanet->yPos(), closestPlanet->mass());
+		m_PlayerPointer->accelerate(gravity.magnitude, gravity.direction);
+	}
+	//apply gravity for closest star
+	if (closestStar != NULL) {
+		Force gravity = CalculateGravity(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
+			closestStar->xPos(), closestStar->yPos(), closestStar->mass());
+		m_PlayerPointer->accelerate(gravity.magnitude, gravity.direction);
 	}
 
 }

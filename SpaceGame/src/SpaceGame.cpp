@@ -52,6 +52,11 @@ void SpaceGame::update(double deltaTime) {
 	if (HELD_SPACE) {
 		m_Ship.brake(deltaTime);
 	}
+	//keeps ship pointing in direction of motion
+	if (HELD_SHIFT) {
+		m_Ship.resetRotation();
+		m_Ship.rotate(-m_Ship.travelDirection());
+	}
 	m_Ship.update(deltaTime);
 
 	//camera
@@ -109,6 +114,15 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 		}
 		else if (action == GLFW_RELEASE) {
 			HELD_W = false;
+		}
+	}
+
+	if (key == GLFW_KEY_LEFT_SHIFT) {
+		if (action == GLFW_PRESS) {
+			HELD_SHIFT = true;
+		}
+		else if (action == GLFW_RELEASE) {
+			HELD_SHIFT = false;
 		}
 	}
 }
