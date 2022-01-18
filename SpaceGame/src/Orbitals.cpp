@@ -8,24 +8,24 @@ void Orbital::render() {
 //Star
 Star::Star(StarInfo star, unsigned int index) 
 {
-	//set pointer
+	//Set pointer
 	pointer = { ObjectType::Star, index };
 
 	m_XPos = star.x;
 	m_YPos = star.y;
 	m_Mass = star.mass;
 
-	//work out radius
+	//Work out radius
 	m_Radius = sqrt(m_Mass / SG_PI) * 100.0f;
 
-	//make circle
+	//Make circle
 	m_Orbital = CreateCircle(m_XPos, m_YPos, m_Radius);
 
-	//make light bubble
+	//Make light bubble
 	m_Light = CreateCircle(m_XPos, m_YPos, m_Radius * 10);
 
-	//sets colour
-	m_Temperature = star.temp;
+	//Sets colour
+	m_Type = star.temp;
 	switch (star.temp) 
 	{
 	case StarType::RED_DWARF:
@@ -110,14 +110,14 @@ void Star::render() {
 
 	Renderer::commitPrimitive(&m_Light, GetElementCount(Shape::CIRCLE), Renderer::s_Circle_I, Renderer::IND_CIRCLE);
 
-	//inherited
+	//Inherited
 	Orbital::render();
 }
 
 StarType ReturnRandomStar() {
 	int random = rand() % STAR_MAX_PROBABILITY;
 
-	//must be in order
+	//Must be in order
 	if (random < s_StarProbabilities.RED_DWARF) {
 		return StarType::RED_DWARF;
 	}
@@ -130,7 +130,7 @@ StarType ReturnRandomStar() {
 	else if (random < s_StarProbabilities.BLUE_GIANT) {
 		return StarType::BLUE_GIANT;
 	}
-	//defaults to
+	//Defaults to
 	return StarType::RED_DWARF;
 }
 
@@ -145,7 +145,7 @@ float GetRandomStarMass(StarType type) {
 	case StarType::BLUE_GIANT:
 		return (float)(rand() % 300) + 180.0f;
 	}
-	return 100.0f; //default
+	return 100.0f; //Default
 }
 
 float GetRandomOrbitDistance(StarType type) {
@@ -160,12 +160,12 @@ float GetRandomOrbitDistance(StarType type) {
 	case StarType::BLUE_GIANT:
 		return MINIMUM_ORBIT_BLUE_GIANT + (rand() % 200);
 	}
-	return MINIMUM_ORBIT_RED_DWARF; //default
+	return MINIMUM_ORBIT_RED_DWARF; //Default
 }
 
 //Planets
 Planet::Planet(PlanetInfo planet, StarType parentColor, unsigned int index) {
-	//set pointer
+	//Set pointer
 	pointer = { ObjectType::Planet, index };
 
 	//x and y pos are dependant on rotation
@@ -178,25 +178,25 @@ Planet::Planet(PlanetInfo planet, StarType parentColor, unsigned int index) {
 	m_Mass = planet.mass;
 	m_OrbitDistance = planet.orbitDistance;
 
-	//work out radius
+	//Work out radius
 	m_Radius = sqrt(m_Mass / SG_PI) * 100.0f;
 
-	//make circle
+	//Make circle
 	m_Orbital = CreateCircle(m_RotationX, m_RotationY + m_OrbitDistance, m_Radius);
 
-	//sets type
+	//Sets type
 	m_Type = planet.type;
 
-	//all planets assumed to be created at 12 o clock relative to parent star
+	//All planets assumed to be created at 12 o clock relative to parent star
 	ColorPlanet(m_Type, parentColor, &m_Orbital, m_OrbitDistance);
 	
-	//rotate planet relative to star
+	//Rotate planet relative to star
 	RotateShape(&m_Orbital, m_RotationX, m_RotationY, m_Angle, Shape::CIRCLE);
 }
 
 //Colors planets with lighting depending on parent star - all decided on creation and not modified
 void ColorPlanet(PlanetType type, StarType parentColor, void* orbital, float orbitDistance) {
-	//setup color - keep base color <= 0.65 to avoid clamping - and to keep dark
+	//Setup color - keep base color <= 0.65 to avoid clamping - and to keep dark
 	float r = 0.0f;
 	float g = 0.0f;
 	float b = 0.0f;
@@ -248,13 +248,13 @@ void ColorPlanet(PlanetType type, StarType parentColor, void* orbital, float orb
 		break;
 	}
 
-	//adjust front face lighting - max change +0.35 - if followed should be in range and avoid clamping
+	//Adjust front face lighting - max change +0.35 - if followed should be in range and avoid clamping
 	float rOff = 0.0f;
 	float gOff = 0.0f;
 	float bOff = 0.0f;
 
-	//adds offset and divides by orbit distance / min distance for max lighting
-	//distanceFactor = m_OrbitDistance / min distance - should be one below min;
+	//Adds offset and divides by orbit distance / min distance for max lighting
+	//DistanceFactor = m_OrbitDistance / min distance - should be one below min;
 	float distanceFactor = 0.1f;
 
 	switch (parentColor) {
@@ -292,10 +292,10 @@ void ColorPlanet(PlanetType type, StarType parentColor, void* orbital, float orb
 		break;
 	}
 
-	//color with brighter values
+	//Color with brighter values
 	ColorShape(orbital, r + rOff, g + gOff, b + bOff, Shape::CIRCLE);
 
-	//color first 32 vertices in base color
+	//Color first 32 vertices in base color
 	for (int i = 1; i < 33; i++) {
 		ColorShapeVertex(orbital, i, r, g, b, Shape::CIRCLE);
 	}
@@ -305,7 +305,7 @@ void Planet::update(double deltaTime) {
 	m_Angle += deltaTime * m_Velocity;
 	RotateShape(&m_Orbital, m_RotationX, m_RotationY, deltaTime * m_Velocity, Shape::CIRCLE);
 
-	//set location from orbital centre
+	//Set location from orbital centre
 	m_XPos = m_Orbital[0].position.a;
 	m_YPos = m_Orbital[0].position.b;
 }
@@ -314,7 +314,7 @@ PlanetType ReturnRandomPlanet()
 {
 	int random = rand() % PLANET_MAX_PROBABILITY;
 
-	//must be in order
+	//Must be in order
 	if (random < s_PlanetProbabilities.BLUE_ROCKY) {
 		return PlanetType::BLUE_ROCKY;
 	}
@@ -339,6 +339,6 @@ PlanetType ReturnRandomPlanet()
 	else if (random < s_PlanetProbabilities.YELLOW_GAS) {
 		return PlanetType::YELLOW_GAS;
 	}
-	//defaults to
+	//Defaults to
 	return PlanetType::BLUE_ROCKY;
 }

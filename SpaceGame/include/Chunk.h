@@ -5,7 +5,10 @@
 #include "Renderer.h"
 #include "ObjectManagement.h"
 
-const float CHUNK_TO_WORLD_FACTOR = 16384.0f; //2560 coords in 1 chunk
+//Constants for world gen:
+
+//Converts chunk width to world coordinates and defines chunk range generated around player
+const float CHUNK_TO_WORLD_FACTOR = 16384.0f;
 const unsigned char DRAW_LIMIT = 5;
 
 //Keeps track of how many chunks are generated in one cycle
@@ -17,39 +20,45 @@ const float MINIMUM_ORBIT_SOLAR = 3300.0f;
 const float MINIMUM_ORBIT_RED_GIANT = 3800.0f;
 const float MINIMUM_ORBIT_BLUE_GIANT = 4000.0f;
 
+//Defines what chunk an object resides in
 struct ChunkLocation
 {
 	int x;
 	int y;
 };
-//find chunk id of current object
+
+//Find chunk id of current object
 ChunkLocation LocateChunk(float xPos, float yPos);
 
+//Chunk is a section of the world which can contain Game Objects within and is responsible for them
 class Chunk
 {
 public:
+	//Constructors
 	Chunk() = default;
 	Chunk(int x, int y, Renderer* ren);
 	~Chunk() = default;
 
-	void makeGrid();
-	void render();
-	int x() const { return m_IDX; }
-	int y() const { return m_IDY; }
+	//Functions
+	void makeGrid();				//Creates grid to represent chunk borders
+	void render();					//Draws grid
+	int x() const { return m_IDX; } //Returns x id
+	int y() const { return m_IDY; } //Returns y id
 
-	//Object management
-	//Assigns object to chunk - returns index
-	unsigned char assignObjectToChunk(ObjectPointer object);
-	void deassignObjectToChunk(unsigned char index);
+	//Object management:
+	unsigned char assignObjectToChunk(ObjectPointer object);				//Assigns object to chunk - returns index
+	void deassignObjectToChunk(unsigned char index);						//Deassigns object from chunk taking index as value
 
-	//provide read only access to objects
+	//Provide read only access to objects stored in chunk
 	const ObjectPointer* chunkObjects() const { return m_ChunkObjects; }
 
+	//Constant for how many objects can exist in a chunk
 	static const unsigned char s_OBJECT_COUNT = 24;
 
 private:
-	Line l1;
-	Line l2;
+
+	Line m_L1;	//Grid lines
+	Line m_L2;
 
 	Renderer* m_Renderer;
 
@@ -64,7 +73,8 @@ private:
 		NULL_OBJECT, NULL_OBJECT, NULL_OBJECT, NULL_OBJECT
 	};
 
-	int m_IDX = 0; //chunks are defined by lower left corner
+	//Chunks are defined by lower left corner
+	int m_IDX = 0; 
 	int m_IDY = 0;
 	float m_XPos = 0;
 	float m_YPos = 0;

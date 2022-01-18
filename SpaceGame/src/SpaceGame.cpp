@@ -4,11 +4,11 @@ bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback 
 	bool initSuccess = Game::init(name, kCallback, sCallback);
 
 	//create ship
-	m_Ship = Ship(100.0f);
-	m_Ship.setRenderer(&m_Renderer);
+	m_Player = Ship(100.0f);
+	m_Player.setRenderer(&m_Renderer);
 
 	//init world
-	m_World.init(&m_Ship);
+	m_World.init(&m_Player);
 	m_World.setRenderer(&m_Renderer);
 	m_World.initialGenerateChunks();
 
@@ -21,7 +21,7 @@ bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback 
 
 void SpaceGame::render() {
 	//commit primitives and check bounds and stuff here
-	m_Ship.render();
+	m_Player.render();
 	m_World.render();
 	Game::render(); //call at bottom to inherit method
 }
@@ -30,23 +30,23 @@ float angle = 0.0f;
 void SpaceGame::update(double deltaTime) {
 
 	//world update
-	if (lastShipLocation.x != m_Ship.location().x || lastShipLocation.y != m_Ship.location().y) {
-		m_World.manageChunks(m_Ship.location());
-		lastShipLocation = m_Ship.location();
+	if (lastShipLocation.x != m_Player.location().x || lastShipLocation.y != m_Player.location().y) {
+		m_World.manageChunks(m_Player.location());
+		lastShipLocation = m_Player.location();
 	}
 
 	//if update returns false, reset world
 	if (!m_World.update(deltaTime, m_GlfwTime)) {
 
 		//create new ship
-		m_Ship = Ship(100.0f);
-		m_Ship.setRenderer(&m_Renderer);
+		m_Player = Ship(100.0f);
+		m_Player.setRenderer(&m_Renderer);
 
 		//create new world
 		m_World = World();
 		
 		//init world
-		m_World.init(&m_Ship);
+		m_World.init(&m_Player);
 		m_World.setRenderer(&m_Renderer);
 		m_World.initialGenerateChunks();
 	}
@@ -55,26 +55,26 @@ void SpaceGame::update(double deltaTime) {
 
 	//ship
 	if (HELD_A) {
-		m_Ship.rotate(6.0f * deltaTime);
+		m_Player.rotate(6.0f * deltaTime);
 	}
 	if (HELD_D) {
-		m_Ship.rotate(-6.0f * deltaTime);
+		m_Player.rotate(-6.0f * deltaTime);
 	}
 	if (HELD_W) {
-		m_Ship.accelerate(2200.0f * deltaTime);
+		m_Player.accelerate(2200.0f * deltaTime);
 	}
 	if (HELD_SPACE) {
-		m_Ship.brake(deltaTime);
+		m_Player.brake(deltaTime);
 	}
 	//keeps ship pointing in direction of motion
 	if (HELD_SHIFT) {
-		m_Ship.resetRotation();
-		m_Ship.rotate(-m_Ship.travelDirection());
+		m_Player.resetRotation();
+		m_Player.rotate(-m_Player.travelDirection());
 	}
-	m_Ship.update(deltaTime);
+	m_Player.update(deltaTime);
 
 	//camera
-	m_Renderer.camera.positionCamera(-m_Ship.xPos() * m_ZoomLevel, -m_Ship.yPos() * m_ZoomLevel);
+	m_Renderer.camera.positionCamera(-m_Player.xPos() * m_ZoomLevel, -m_Player.yPos() * m_ZoomLevel);
 
 	//inherits
 	Game::update(deltaTime);
@@ -90,8 +90,8 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 
 	//put single button directly in here
 	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-		m_Ship.resetRotation();
-		m_Ship.rotate(-m_Ship.travelDirection());
+		m_Player.resetRotation();
+		m_Player.rotate(-m_Player.travelDirection());
 	}
 
 	//held input

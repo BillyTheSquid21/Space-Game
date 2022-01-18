@@ -8,6 +8,7 @@
 //Constants
 const float SG_PHYS_G = 3256.0f; //gravity constant
 
+//Defines structure containing magnitude and direction of a force
 struct Force
 {
 	float magnitude;

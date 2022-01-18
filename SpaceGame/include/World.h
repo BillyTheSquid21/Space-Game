@@ -9,6 +9,7 @@
 #include "Chunk.h"
 #include "SGPhysics.h"
 
+//World container
 class World
 {
 public:
@@ -32,12 +33,17 @@ public:
 	//Update world - returns false on game over
 	bool update(double deltaTime, double time);
 
+	//Does game over things
 	void gameOver();
 
 private:
 	Renderer* m_Renderer;
 
+	//Stores pointer to player to control
 	Ship* m_PlayerPointer = nullptr;
+
+	//Applies gravity
+	void applyGravity(Star* closestStar, Planet* closestPlanet);
 
 	//Loads and unloads objects
 	void unloadChunkObjects(Chunk& chunk);

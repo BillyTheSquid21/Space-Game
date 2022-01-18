@@ -2,7 +2,7 @@
 #ifndef OBJECT_MANAGEMENT_H
 #define OBJECT_MANAGEMENT_H
 
-//enum to define list object is contained in (star, planet, etc)
+//Enum to define list object is contained in (star, planet, etc)
 enum class ObjectType
 {
 	//Null - no object in slot
@@ -21,8 +21,8 @@ enum class ObjectType
 //Struct to contain type of object and location of instructions in list
 struct ObjectPointer
 {
-	ObjectType type;
-	unsigned int index; //index
+	ObjectType type;	//Object type in memory
+	unsigned int index;	//Index in list of created objects
 };
 
 #endif

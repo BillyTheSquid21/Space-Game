@@ -10,10 +10,11 @@
 class SpaceGame : public Game 
 {
 public:
-	//inherits constructors
+	//Inherits constructors
 	using Game::Game;
 	~SpaceGame() = default;
-
+	
+	//Functions
 	bool init(const char name[], Key_Callback kCallback, Scroll_Callback sCallback);
 	void render();
 	void update(double deltaTime);
@@ -22,22 +23,23 @@ public:
 	void handleScrolling(double xOffset, double yOffset);
 
 private:
-	//can store relevant lists of game objects here
-	Ship m_Ship;
+	//Stores player ship
+	Ship m_Player;
 
-	//keeps track of persistent held input
+	//Keeps track of persistent held input
 	bool m_HeldInput[5];
 
-	//zoom level for transforming transformations
+	//Zoom level for transforming transformations
 	float m_ZoomLevel = 1.0f;
 
-	//world
+	//World
 	World m_World;
-	//last ship chunk
+
+	//Last ship chunk
 	ChunkLocation lastShipLocation = { 0,0 };
 };
 
-//define where in array held persist is kept
+//Define where in array held persist is kept
 #define HELD_A m_HeldInput[0]
 #define HELD_D m_HeldInput[1]
 #define HELD_W m_HeldInput[2]

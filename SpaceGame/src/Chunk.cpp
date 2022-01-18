@@ -6,27 +6,27 @@ ChunkLocation LocateChunk(float xPos, float yPos) {
 
 Chunk::Chunk(int x, int y, Renderer* ren)
 	: m_XPos{ x * CHUNK_TO_WORLD_FACTOR }, m_YPos{ y * CHUNK_TO_WORLD_FACTOR },
-	m_IDX{ x }, m_IDY{ y }, m_Renderer{ ren }
+	m_IDX{ x }, m_IDY{ y }, m_Renderer{ ren }, m_L1{NULL}, m_L2{NULL}
 {
 
 }
 
 void Chunk::makeGrid() {
 	//create grid
-	l1 = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + CHUNK_TO_WORLD_FACTOR, 3.4f);
-	l2 = CreateLine(m_XPos, m_YPos, m_XPos + CHUNK_TO_WORLD_FACTOR, m_YPos, 3.4f);
-	LayerShape(&l1, LAYER_1, Shape::LINE);
-	LayerShape(&l2, LAYER_1, Shape::LINE);
+	m_L1 = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + CHUNK_TO_WORLD_FACTOR, 3.4f);
+	m_L2 = CreateLine(m_XPos, m_YPos, m_XPos + CHUNK_TO_WORLD_FACTOR, m_YPos, 3.4f);
+	LayerShape(&m_L1, LAYER_1, Shape::LINE);
+	LayerShape(&m_L2, LAYER_1, Shape::LINE);
 }
 
 void Chunk::render() {
-	if (m_Renderer->isInBounds(&l1, GetVerticesCount(Shape::LINE))) {
-		Renderer::commitPrimitive(&l1, GetElementCount(Shape::LINE),
+	if (m_Renderer->isInBounds(&m_L1, GetVerticesCount(Shape::LINE))) {
+		Renderer::commitPrimitive(&m_L1, GetElementCount(Shape::LINE),
 			Renderer::s_Line_I, Renderer::IND_LINE);
 	}
 
-	if (m_Renderer->isInBounds(&l2, GetVerticesCount(Shape::LINE))) {
-		Renderer::commitPrimitive(&l2, GetElementCount(Shape::LINE),
+	if (m_Renderer->isInBounds(&m_L2, GetVerticesCount(Shape::LINE))) {
+		Renderer::commitPrimitive(&m_L2, GetElementCount(Shape::LINE),
 			Renderer::s_Line_I, Renderer::IND_LINE);
 	}
 }
@@ -41,7 +41,7 @@ unsigned char Chunk::assignObjectToChunk(ObjectPointer object) {
 		}
 	}
 
-	//if gets to end
+	//If gets to end
 	EngineLog("Chunk has run out of object slots! ", m_IDX, m_IDY);
 	return s_OBJECT_COUNT; //returns number at max - tells object to handle error
 }

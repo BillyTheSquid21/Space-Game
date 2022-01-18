@@ -85,26 +85,28 @@ void World::unloadChunkObjects(Chunk& chunk) {
 		switch (chunk.chunkObjects()[i].type) {
 		case ObjectType::Star:
 			for (int j = 0; j < m_StarsList.size(); j++) {
-				if (m_StarsList[j].pointer.index == chunk.chunkObjects()[i].index) {
-					//update instructions
-					m_StarsInstructionsList[m_StarsList[j].pointer.index] = m_StarsList[j].unload();
-
-					//remove from rendering list
-					m_StarsList.erase(m_StarsList.begin() + j);
-					break;
+				if (m_StarsList[j].pointer.index != chunk.chunkObjects()[i].index) {
+					continue;
 				}
+				//update instructions
+				m_StarsInstructionsList[m_StarsList[j].pointer.index] = m_StarsList[j].unload();
+
+				//remove from rendering list
+				m_StarsList.erase(m_StarsList.begin() + j);
+				break;
 			}
 			break;
 		case ObjectType::Planet:
 			for (int j = 0; j < m_PlanetsList.size(); j++) {
-				if (m_PlanetsList[j].pointer.index == chunk.chunkObjects()[i].index) {
-					//update instructions
-					m_PlanetsInstructionsList[m_PlanetsList[j].pointer.index] = m_PlanetsList[j].unload();
-
-					//remove from rendering list
-					m_PlanetsList.erase(m_PlanetsList.begin() + j);
-					break;
+				if (m_PlanetsList[j].pointer.index != chunk.chunkObjects()[i].index) {
+					continue;
 				}
+				//update instructions
+				m_PlanetsInstructionsList[m_PlanetsList[j].pointer.index] = m_PlanetsList[j].unload();
+
+				//remove from rendering list
+				m_PlanetsList.erase(m_PlanetsList.begin() + j);
+				break;
 			}
 			break;
 
@@ -251,25 +253,26 @@ void World::manageChunks(ChunkLocation originChunk)
 
 		else {	//else load from unloaded chunks
 			for (int j = 0; j < m_UnloadedChunks.size(); j++) {
-				if (m_ChunkIDCache[i].x == m_UnloadedChunks[j].x() && m_ChunkIDCache[i].y == m_UnloadedChunks[j].y()) {
-					newChunkList[newListIndex] = m_UnloadedChunks[j];
-
-					//load in objects
-					loadChunkObjects(newChunkList[newListIndex]);
-
-					newListIndex++;
-
-					//remove from unloaded
-					m_UnloadedChunks.erase(m_UnloadedChunks.begin() + j);
-					break;
+				if (m_ChunkIDCache[i].x != m_UnloadedChunks[j].x() || m_ChunkIDCache[i].y != m_UnloadedChunks[j].y()) {
+					continue;
 				}
+				newChunkList[newListIndex] = m_UnloadedChunks[j];
+
+				//load in objects
+				loadChunkObjects(newChunkList[newListIndex]);
+
+				newListIndex++;
+
+				//remove from unloaded
+				m_UnloadedChunks.erase(m_UnloadedChunks.begin() + j);
+				break;
 			}
 		}
 	}
-
+	//Sees if a star should be generated
 	checkStarGen();
 
-	//assign new array at end
+	//Assign new array at end
 	m_ChunkList = newChunkList;
 }
 
@@ -353,6 +356,20 @@ bool World::update(double deltaTime, double time) {
 		}
 	}
 
+	//Applies gravity
+	applyGravity(closestStar, closestPlanet);
+
+	//run dying animation
+	if (m_PlayerPointer->dying()) {
+		if (m_PlayerPointer->death(deltaTime)) {
+			gameOver();
+			return false;
+		}
+	}
+	return true;
+}
+
+void World::applyGravity(Star* closestStar, Planet* closestPlanet) {
 	//apply gravity for closest planet
 	if (closestPlanet != NULL) {
 		Force gravity = CalculateGravity(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
@@ -365,15 +382,6 @@ bool World::update(double deltaTime, double time) {
 			closestStar->xPos(), closestStar->yPos(), closestStar->mass());
 		m_PlayerPointer->accelerate(gravity.magnitude, gravity.direction);
 	}
-
-	//run dying animation
-	if (m_PlayerPointer->dying()) {
-		if (m_PlayerPointer->death(deltaTime)) {
-			gameOver();
-			return false;
-		}
-	}
-	return true;
 }
 
 void World::generateSolarSystem(int x, int y, Chunk& chunk) {
