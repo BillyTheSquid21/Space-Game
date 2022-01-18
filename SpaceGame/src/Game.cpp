@@ -109,7 +109,7 @@ void Game::handleScrolling(double xOffset, double yOffset) {
 //Update
 void Game::update(double deltaTime) 
 {
-    
+
 }
 
 //Clean
@@ -117,4 +117,8 @@ void Game::clean()
 {
     glfwDestroyWindow(window);
     glfwTerminate();
+}
+
+void Game::setTime(double time) {
+    m_GlfwTime = time;
 }

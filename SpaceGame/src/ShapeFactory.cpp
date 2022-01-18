@@ -215,3 +215,14 @@ void ColorShapeVertex(void* verticesArray, unsigned int vertex, float r, float g
 	}
 	EngineLog("Error: Shape doesn't have vertice at specified location");
 }
+
+void ScaleShape(void* verticesArray, float scale, float centreX, float centreY, Shape type) {
+	Vertex* vertices = (Vertex*)verticesArray;
+
+	for (int i = 0; i < GetVerticesCount(type); i++) {
+		float newX = (centreX - vertices[i].position.a) * scale;
+		float newY = (centreY - vertices[i].position.b) * scale;
+		vertices[i].position.a = newX + centreX;
+		vertices[i].position.b = newY + centreY;
+	}
+}

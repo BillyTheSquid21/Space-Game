@@ -58,6 +58,7 @@ int main(void) //TODO: get delta time working perfectly
     {  
         // Measure speed
         double currentTime = glfwGetTime();
+        game->setTime(currentTime);
         framecount++;
 
         // If a second has passed.

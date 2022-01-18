@@ -57,6 +57,7 @@ void RotateShape(void* verticesArray, float rotationCentreX, float rotationCentr
 void ColorShape(void* verticesArray, float r, float g, float b, Shape type);
 void ColorShapeVertex(void* verticesArray, unsigned int vertex, float r, float g, float b, Shape type);
 void LayerShape(void* verticesArray, float layer, Shape type);
+void ScaleShape(void* verticesArray, float scale, float centreX, float centreY, Shape type);
 
 //Utility
 unsigned short int GetVerticesCount(Shape type);

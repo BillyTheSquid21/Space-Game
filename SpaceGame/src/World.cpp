@@ -298,7 +298,7 @@ void World::render() {
 	}
 }
 
-void World::update(double deltaTime) {
+bool World::update(double deltaTime, double time) {
 
 	//update stars
 	Star* closestStar = nullptr;
@@ -311,12 +311,16 @@ void World::update(double deltaTime) {
 		if (CircleCollision(m_PlayerPointer->triangle(), GetVerticesCount(Shape::TRI),
 			m_StarsList[i].xPos(), m_StarsList[i].yPos(), m_StarsList[i].radius())) {
 			
-			//do collision here
+			//Do collision here
+			if (!m_PlayerPointer->dying()) {
+				m_PlayerPointer->timeOfDeath(time);
+			}
 		}
 
 		//see what star is closest
 		float distance = CalculateDistance(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
 			m_StarsList[i].xPos(), m_StarsList[i].yPos());
+
 		if (distance < closestStarDistance) {
 			closestStarDistance = distance;
 			closestStar = &m_StarsList[i];
@@ -332,9 +336,12 @@ void World::update(double deltaTime) {
 
 		//Check if collision has happened
 		if (CircleCollision(m_PlayerPointer->triangle(), GetVerticesCount(Shape::TRI),
-			m_StarsList[i].xPos(), m_PlanetsList[i].yPos(), m_PlanetsList[i].radius())) {
+			m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos(), m_PlanetsList[i].radius())) {
 
 			//do collision here
+			if (!m_PlayerPointer->dying()) {
+				m_PlayerPointer->timeOfDeath(time);
+			}
 		}
 
 		//see what planet is closest
@@ -359,6 +366,14 @@ void World::update(double deltaTime) {
 		m_PlayerPointer->accelerate(gravity.magnitude, gravity.direction);
 	}
 
+	//run dying animation
+	if (m_PlayerPointer->dying()) {
+		if (m_PlayerPointer->death(deltaTime)) {
+			gameOver();
+			return false;
+		}
+	}
+	return true;
 }
 
 void World::generateSolarSystem(int x, int y, Chunk& chunk) {
@@ -429,4 +444,14 @@ void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance)
 	chunk.assignObjectToChunk(planetObject.pointer);
 	m_PlanetsList.push_back(planetObject);
 	m_PlanetsInstructionsList.push_back(planetInfo);
+}
+
+void World::gameOver() 
+{
+	//set ship position to origin
+	m_PlayerPointer->position(0.0f, 0.0f);
+	m_PlayerPointer->resetRotation();
+
+	//set speed to 0
+	m_PlayerPointer->resetSpeed();
 }

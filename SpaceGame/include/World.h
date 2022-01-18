@@ -4,7 +4,8 @@
 
 #include <vector>
 #include <cstdlib>
-#include "SpaceGameObjects.h"
+#include "Ship.h"
+#include "Orbitals.h"
 #include "Chunk.h"
 #include "SGPhysics.h"
 
@@ -16,7 +17,7 @@ public:
 
 	void init(Ship* player);
 
-	//set renderer
+	//Set renderer
 	void setRenderer(Renderer* ren);
 
 	//Create first Chunks
@@ -25,15 +26,20 @@ public:
 	//Create and load new Chunks
 	void manageChunks(ChunkLocation originChunk);
 
+	//Render world
 	void render();
-	void update(double deltaTime);
+
+	//Update world - returns false on game over
+	bool update(double deltaTime, double time);
+
+	void gameOver();
 
 private:
 	Renderer* m_Renderer;
 
 	Ship* m_PlayerPointer = nullptr;
 
-	//loads and unloads objects
+	//Loads and unloads objects
 	void unloadChunkObjects(Chunk& chunk);
 	void loadChunkObjects(Chunk& chunk);
 

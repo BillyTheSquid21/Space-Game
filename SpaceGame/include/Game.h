@@ -32,6 +32,7 @@ public:
 	void handleInput(int key, int scancode, int action, int mods);
 	void handleScrolling(double xOffset, double yOffset);
 	void update(double deltaTime);
+	void setTime(double time);
 	void render();
 	void clean();
 
@@ -45,6 +46,8 @@ protected:
 
 	int m_Width;
 	int m_Height;
+
+	double m_GlfwTime;
 
 	double m_SecondsPerFrameCap = (1.0 / 500.0) * 1000.0; //Init to 500, can be changed
 

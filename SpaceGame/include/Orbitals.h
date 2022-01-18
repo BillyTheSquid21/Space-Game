@@ -1,60 +1,9 @@
 #pragma once
-#ifndef SPACE_GAME_OBJECTS_H
-#define SPACE_GAME_OBJECTS_H
+#ifndef ORBITALS_H
+#define ORBITALS_H
 
 #include "GameObject.h"
 #include "Chunk.h"
-
-class Ship : public GameObject
-{
-public:
-	Ship() = default;
-	Ship(float size);
-	~Ship() = default;
-
-	//functions
-	void render();
-	void update(double deltaTime);
-	void translate(float deltaX, float deltaY);
-	void rotate(float angle);
-	void resetRotation();
-	void position(float xNew, float yNew);
-
-	//kinematics
-	void accelerate(float a);
-	void accelerate(float a, float angle);
-	void brake(double deltaTime);
-
-	//getters - travel direction adds 90 degrees for consistency
-	float direction() const { return m_CumulativeAngle; }
-	float travelDirection() const { return atan(m_VelocityX / m_VelocityY); }
-	ChunkLocation location() const { return m_CurrentChunk; }
-	Tri* triangle() { return &m_Ship; }
-
-private:
-
-	//Kinematics
-	float m_CumulativeAngle = 0.0f;
-	float m_VelocityX = 0.0f;
-	float m_VelocityY = 10.0f;
-	float m_MaxSpeed = 10000.0f;
-	void accelerateVelocity(float newVelocityX, float newVelocityY);
-
-	//current chunk
-	ChunkLocation m_CurrentChunk = { 0, 0 };
-
-	//color
-	float r;
-	float g;
-	float b;
-	bool rUp = true;
-	bool bUp = true;
-	bool gUp = false;
-
-	void DoTheFunky(float dt);
-	Tri m_Ship;
-	Line m_Direction;
-};
 
 //Planet or star sort of objects
 class Orbital : public GameObject 

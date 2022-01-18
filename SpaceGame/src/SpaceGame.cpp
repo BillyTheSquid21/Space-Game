@@ -35,7 +35,21 @@ void SpaceGame::update(double deltaTime) {
 		lastShipLocation = m_Ship.location();
 	}
 
-	m_World.update(deltaTime);
+	//if update returns false, reset world
+	if (!m_World.update(deltaTime, m_GlfwTime)) {
+
+		//create new ship
+		m_Ship = Ship(100.0f);
+		m_Ship.setRenderer(&m_Renderer);
+
+		//create new world
+		m_World = World();
+		
+		//init world
+		m_World.init(&m_Ship);
+		m_World.setRenderer(&m_Renderer);
+		m_World.initialGenerateChunks();
+	}
 
 	//update position and things here
 

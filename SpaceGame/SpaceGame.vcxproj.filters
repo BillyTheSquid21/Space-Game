@@ -39,7 +39,7 @@
     <ClCompile Include="src\SpaceGame.cpp">
       <Filter>Source Files\Game Specific</Filter>
     </ClCompile>
-    <ClCompile Include="src\SpaceGameObjects.cpp">
+    <ClCompile Include="src\Orbitals.cpp">
       <Filter>Source Files\Game Specific</Filter>
     </ClCompile>
     <ClCompile Include="src\GameObject.cpp">
@@ -52,6 +52,9 @@
       <Filter>Source Files\Game Specific</Filter>
     </ClCompile>
     <ClCompile Include="src\SGPhysics.cpp">
+      <Filter>Source Files\Game Specific</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ship.cpp">
       <Filter>Source Files\Game Specific</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,7 +77,7 @@
     <ClInclude Include="include\GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SpaceGameObjects.h">
+    <ClInclude Include="include\Orbitals.h">
       <Filter>Header Files\Game Specific</Filter>
     </ClInclude>
     <ClInclude Include="include\World.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files\Game Specific</Filter>
     </ClInclude>
     <ClInclude Include="include\SGPhysics.h">
+      <Filter>Header Files\Game Specific</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ship.h">
       <Filter>Header Files\Game Specific</Filter>
     </ClInclude>
   </ItemGroup>

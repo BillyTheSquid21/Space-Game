@@ -155,8 +155,9 @@
     <ClCompile Include="src\SGUtil.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\ShapeFactory.cpp" />
+    <ClCompile Include="src\Ship.cpp" />
     <ClCompile Include="src\SpaceGame.cpp" />
-    <ClCompile Include="src\SpaceGameObjects.cpp" />
+    <ClCompile Include="src\Orbitals.cpp" />
     <ClCompile Include="src\World.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,8 +169,9 @@
     <ClInclude Include="include\SGPhysics.h" />
     <ClInclude Include="include\SGUtil.h" />
     <ClInclude Include="include\ShapeFactory.h" />
+    <ClInclude Include="include\Ship.h" />
     <ClInclude Include="include\SpaceGame.h" />
-    <ClInclude Include="include\SpaceGameObjects.h" />
+    <ClInclude Include="include\Orbitals.h" />
     <ClInclude Include="include\World.h" />
   </ItemGroup>
   <ItemGroup>

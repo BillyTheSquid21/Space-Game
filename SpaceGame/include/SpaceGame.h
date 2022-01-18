@@ -4,7 +4,7 @@
 #define SPACE_GAME_H
 
 #include "Game.h"
-#include "SpaceGameObjects.h"
+#include "Ship.h"
 #include "World.h"
 
 class SpaceGame : public Game 
