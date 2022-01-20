@@ -4,13 +4,20 @@ bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback 
 	bool initSuccess = Game::init(name, kCallback, sCallback);
 
 	//create ship
-	m_Player = Ship(100.0f);
+	m_Player = Ship(100.0f, { 0.094f, 0.584f, 0.604f });
 	m_Player.setRenderer(&m_Renderer);
 
 	//init world
 	m_World.init(&m_Player);
 	m_World.setRenderer(&m_Renderer);
 	m_World.initialGenerateChunks();
+
+	//make other ship and ai
+	m_ShipTest = Ship(100.0f, {0.34f, 0.584f, 0.12f});
+	m_ShipTest.translate( 0.0f, -800.0f);
+	m_ShipAI = AI::AI(&m_Player, &m_ShipTest);
+	m_ShipAI.setWorld(&m_World);
+	m_ShipTest.setMaxSpeed(15000);
 
 	//init renderer
 	m_Renderer.camera.setZoomCamera(0.1f);
@@ -23,35 +30,15 @@ void SpaceGame::render() {
 	//commit primitives and check bounds and stuff here
 	m_Player.render();
 	m_World.render();
+
+	//ai test
+	m_ShipTest.render();
+
 	Game::render(); //call at bottom to inherit method
 }
 
 float angle = 0.0f;
 void SpaceGame::update(double deltaTime) {
-
-	//world update
-	if (lastShipLocation.x != m_Player.location().x || lastShipLocation.y != m_Player.location().y) {
-		m_World.manageChunks(m_Player.location());
-		lastShipLocation = m_Player.location();
-	}
-
-	//if update returns false, reset world
-	if (!m_World.update(deltaTime, m_GlfwTime)) {
-
-		//create new ship
-		m_Player = Ship(100.0f);
-		m_Player.setRenderer(&m_Renderer);
-
-		//create new world
-		m_World = World();
-		
-		//init world
-		m_World.init(&m_Player);
-		m_World.setRenderer(&m_Renderer);
-		m_World.initialGenerateChunks();
-	}
-
-	//update position and things here
 
 	//ship
 	if (HELD_A) {
@@ -69,9 +56,42 @@ void SpaceGame::update(double deltaTime) {
 	//keeps ship pointing in direction of motion
 	if (HELD_SHIFT) {
 		m_Player.resetRotation();
-		m_Player.rotate(-m_Player.travelDirection());
+		m_Player.rotate(m_Player.travelDirection() - SG_PI / 2); //Ship is off by 90 deg as relative to vertical axis
 	}
 	m_Player.update(deltaTime);
+
+	//world update
+	if (lastShipLocation.x != m_Player.location().x || lastShipLocation.y != m_Player.location().y) {
+		m_World.manageChunks(m_Player.location());
+		lastShipLocation = m_Player.location();
+	}
+
+	//if update returns false, reset world
+	if (!m_World.update(deltaTime, m_GlfwTime)) {
+
+		//create new ship
+		m_Player = Ship(100.0f, { 0.094f, 0.584f, 0.604f });
+		m_Player.setRenderer(&m_Renderer);
+
+		m_ShipTest = Ship(100.0f, { 0.34f, 0.584f, 0.12f });
+		m_ShipTest.setRenderer(&m_Renderer);
+		m_ShipTest.setMaxSpeed(15000);
+
+		//create new world
+		m_World = World();
+		
+		//init world
+		m_World.init(&m_Player);
+		m_World.setRenderer(&m_Renderer);
+		m_World.initialGenerateChunks();
+
+		//give ai world
+		m_ShipAI.setWorld(&m_World);
+	}
+
+	//update test ai
+	m_ShipAI.update(deltaTime);
+	m_ShipTest.update(deltaTime);
 
 	//camera
 	m_Renderer.camera.positionCamera(-m_Player.xPos() * m_ZoomLevel, -m_Player.yPos() * m_ZoomLevel);

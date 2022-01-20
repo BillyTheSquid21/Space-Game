@@ -14,8 +14,8 @@ void World::setRenderer(Renderer* ren) {
 	m_Renderer = ren;
 }
 
-void World::initialGenerateChunks() 
-{	
+void World::initialGenerateChunks()
+{
 	//for checking amount gen
 	unsigned int total = 0;
 
@@ -189,9 +189,9 @@ void World::generateChunkRange(ChunkLocation originChunk) {
 	}
 }
 
-void World::manageChunks(ChunkLocation originChunk) 
-{	
-	
+void World::manageChunks(ChunkLocation originChunk)
+{
+
 	//Bounds
 	int leftBound = originChunk.x - DRAW_LIMIT;
 	int rightBound = originChunk.x + DRAW_LIMIT;
@@ -313,7 +313,7 @@ bool World::update(double deltaTime, double time) {
 		//Check if collision has happened
 		if (CircleCollision(m_PlayerPointer->triangle(), GetVerticesCount(Shape::TRI),
 			m_StarsList[i].xPos(), m_StarsList[i].yPos(), m_StarsList[i].radius())) {
-			
+
 			//Do collision here
 			if (!m_PlayerPointer->dying()) {
 				m_PlayerPointer->timeOfDeath(time);
@@ -424,8 +424,8 @@ void World::generateSolarSystem(int x, int y, Chunk& chunk) {
 }
 
 //generate Planets
-void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance) 
-{	
+void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance)
+{
 	//initialise values to assign to planet
 	PlanetType type = ReturnRandomPlanet();
 	float mass = 1.0f;
@@ -454,7 +454,7 @@ void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance)
 	m_PlanetsInstructionsList.push_back(planetInfo);
 }
 
-void World::gameOver() 
+void World::gameOver()
 {
 	//set ship position to origin
 	m_PlayerPointer->position(0.0f, 0.0f);

@@ -17,6 +17,7 @@ struct Force
 
 //Calculations
 float CalculateDistance(float x1, float y1, float x2, float y2);
+float CalculateAngle(float x1, float y1, float x2, float y2);
 Force CalculateGravity(float x1, float y1, float x2, float y2, float mass);
 
 //Collision

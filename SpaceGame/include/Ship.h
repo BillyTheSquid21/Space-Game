@@ -4,6 +4,7 @@
 
 #include "GameObject.h"
 #include "Chunk.h"
+#include "SGPhysics.h"
 
 //Object that plays a short animation on ship death
 static class ShipDeath : public GameObject
@@ -17,7 +18,7 @@ public:
 	//Functions
 	void render();
 	void update(double deltaTime);
-	void startDeath(float x, float y, float direction); //Tells animation where to origin and what direction to progress in
+	void startDeath(float x, float y, float direction, float speed); //Tells animation where to origin and what direction to progress in
 
 	//Triangles
 	Tri m_Tri1;
@@ -28,6 +29,7 @@ private:
 	//Kinematic values
 	float m_DeathX = 0.0f;
 	float m_DeathY = 0.0f;
+	float m_DeathVelocity = 0.0f;
 	float m_Angle = 0.0f;
 };
 
@@ -37,8 +39,8 @@ class Ship : public GameObject
 public:
 	//Constructors
 	Ship() = default;
-	Ship(float size);
-	~Ship() = default;
+	Ship(float size, Component3f color);
+	~Ship();
 
 	//Functions
 	void render();
@@ -52,6 +54,7 @@ public:
 	void accelerate(float a);
 	void accelerate(float a, float angle);
 	void brake(double deltaTime);
+	void setMaxSpeed(float max) { m_MaxSpeed = max; }
 	void resetSpeed();
 
 	//Animation
@@ -60,9 +63,18 @@ public:
 
 	//Getters - travel direction adds 90 degrees for consistency
 	float direction() const { return m_CumulativeAngle; }
-	float travelDirection() const { return atan2(m_VelocityY, m_VelocityX); }
+	float travelDirection() const { return CalculateAngle(0.0f, 0.0f, m_VelocityX, m_VelocityY); }
+	float veloctiy() const { return sqrt((m_VelocityX * m_VelocityX) + (m_VelocityY * m_VelocityY)); }
+	Component2f velocityComponent() const { return {m_VelocityX, m_VelocityY}; }
+	Component2f gravityComponent() const { return m_CurrentGravityResultant; }
+
+	//Returns whether the ship is dying
 	bool dying() const { return m_Dying; }
+
+	//Returns chunk ship is in
 	ChunkLocation location() const { return m_CurrentChunk; }
+
+	//Returns shape underlaying ship
 	Tri* triangle() { return &m_Ship; }
 
 private:
@@ -72,16 +84,20 @@ private:
 	float m_VelocityX = 0.0f;
 	float m_VelocityY = 10.0f;
 	float m_MaxSpeed = 10000.0f;
+	Component2f m_CurrentGravityResultant = { 0.0f, 0.0f };			//stores the resultant acceleration on ship externally per frame
 	void accelerateVelocity(float newVelocityX, float newVelocityY);
-
+	
 	//Current chunk
 	ChunkLocation m_CurrentChunk = { 0, 0 };
+
+	//Size
+	float m_Size = 0.0f;
 
 	//Death
 	double m_TimeOfDeath = 0.0;
 	double m_DeathTimer = 0.0;
 	bool m_Dying = false;
-	ShipDeath m_DeathAnimation;
+	ShipDeath* m_DeathAnimation = nullptr;
 
 	//Color
 	float r;

@@ -1,27 +1,26 @@
 #include "Ship.h"
 
 //Ship
-Ship::Ship(float size)
-	: m_Ship{ CreateTri(0.0f, 0.0f, size) }, m_Direction{ CreateLine(0.0f,0.0f, 0.0f, 130.0f, 6.0f) },
-	m_DeathAnimation{ ShipDeath::ShipDeath(size / 2) }
+Ship::Ship(float size, Component3f color)
+	: m_Ship{ CreateTri(0.0f, 0.0f, size) }, m_Direction{ CreateLine(0.0f,0.0f, 0.0f, 130.0f, 6.0f) }
 {
-	r = 0.094f;
-	g = 0.584f;
-	b = 0.604f;
+	m_Size = size;
+	r = color.a;
+	g = color.b;
+	b = color.c;
 	ColorShape(&m_Ship, r, g, b, Shape::TRI);
 	ColorShape(&m_Direction, b, 0.1f, 0.1f, Shape::LINE);
 	LayerShape(&m_Direction, LAYER_4, Shape::LINE);
-
-	//color death animation
-	ColorShape(&m_DeathAnimation.m_Tri1, r, g, b, Shape::TRI);
-	ColorShape(&m_DeathAnimation.m_Tri2, r, g, b, Shape::TRI);
-	ColorShape(&m_DeathAnimation.m_Tri3, r, g, b, Shape::TRI);
 	EngineLog("Ship Created at 0.0, 0.0!");
+}
+
+Ship::~Ship() {
+	delete m_DeathAnimation;
 }
 
 void Ship::render() {
 	if (m_Dying) {
-		m_DeathAnimation.render();
+		m_DeathAnimation->render();
 		return;
 	}
 	Renderer::commitPrimitive(&m_Ship, GetElementCount(Shape::TRI), Renderer::s_Tri_I, Renderer::IND_TRI);
@@ -29,6 +28,8 @@ void Ship::render() {
 }
 
 void Ship::update(double deltaTime) {
+	//reset resultant gravity this frame
+	m_CurrentGravityResultant = { 0.0f, 0.0f };
 
 	//move with velocity
 	translate(m_VelocityX * deltaTime, m_VelocityY * deltaTime);
@@ -53,9 +54,15 @@ void Ship::accelerate(float a) {
 }
 //when an angle is involved, has to be different as is not relative to ship direction
 void Ship::accelerate(float a, float angle) {
-	float newVelocityX = m_VelocityX + a * cos(angle);
-	float newVelocityY = m_VelocityY + a * sin(angle);
+	float xAcc = a * cos(angle);
+	float yAcc = a * sin(angle);
+	float newVelocityX = m_VelocityX + xAcc;
+	float newVelocityY = m_VelocityY + yAcc;
 	accelerateVelocity(newVelocityX, newVelocityY);
+
+	//as currently just gravity uses this, apply to gravity resultant
+	m_CurrentGravityResultant.a += xAcc;
+	m_CurrentGravityResultant.b += yAcc;
 }
 
 void Ship::brake(double deltaTime) {
@@ -105,21 +112,29 @@ void Ship::timeOfDeath(double time) {
 	m_TimeOfDeath = time + 5.0; //dies 5 seconds after death
 	m_Dying = true;
 
+	//color death animation
+	m_DeathAnimation = new ShipDeath(m_Size / 2);
+	ColorShape(&m_DeathAnimation->m_Tri1, r, g, b, Shape::TRI);
+	ColorShape(&m_DeathAnimation->m_Tri2, r, g, b, Shape::TRI);
+	ColorShape(&m_DeathAnimation->m_Tri3, r, g, b, Shape::TRI);
+
 	//activate death animation
-	m_DeathAnimation.startDeath(xPos(), yPos(), -travelDirection());
+	m_DeathAnimation->startDeath(xPos(), yPos(), travelDirection(), veloctiy());
 	//set renderer for animation
-	m_DeathAnimation.setRenderer(m_Renderer);
+	m_DeathAnimation->setRenderer(m_Renderer);
 }
 
 bool Ship::death(double deltaTime) {
 	if (m_DeathTimer > m_TimeOfDeath) {
+		delete m_DeathAnimation;
+		m_DeathAnimation = nullptr; //prevents delete in destructor calling on undefined memory
 		return true;
 	}
 	//add delta time to death
 	m_DeathTimer += deltaTime;
 
 	//run animation
-	m_DeathAnimation.update(deltaTime);
+	m_DeathAnimation->update(deltaTime);
 
 	m_VelocityX = 0.0f;
 	m_VelocityY = 0.0f;
@@ -196,7 +211,7 @@ ShipDeath::ShipDeath(float size) {
 	RotateShape(&m_Tri3, 0.0f, 0.0f, 0.5f, Shape::TRI);
 }
 
-void ShipDeath::startDeath(float x, float y, float direction) {
+void ShipDeath::startDeath(float x, float y, float direction, float speed) {
 	PositionShape(&m_Tri1, x, y, 0.0f, 0.0f, Shape::TRI);
 	PositionShape(&m_Tri2, x, y, 0.0f, 0.0f, Shape::TRI);
 	PositionShape(&m_Tri3, x, y, 0.0f, 0.0f, Shape::TRI);
@@ -216,7 +231,7 @@ void ShipDeath::render() {
 void ShipDeath::update(double deltaTime) {
 
 	//move tris
-	TranslateShape(&m_Tri1, 8000.0f * deltaTime, 8000.0f * deltaTime, Shape::TRI);
-	TranslateShape(&m_Tri2, 0.0f, 8700.5f * deltaTime, Shape::TRI);
-	TranslateShape(&m_Tri3, -8000.0f * deltaTime, 8000.0f * deltaTime, Shape::TRI);
+	TranslateShape(&m_Tri1, 8000.0f * deltaTime * cos(m_Angle), 8000.0f * deltaTime * sin(m_Angle), Shape::TRI);
+	TranslateShape(&m_Tri2, 8000.0f * deltaTime * cos(m_Angle + 0.5f), 8000.0f * deltaTime * sin(m_Angle + 0.5f), Shape::TRI);
+	TranslateShape(&m_Tri3, 8000.0f * deltaTime * cos(m_Angle - 0.5f), 8000.0f * deltaTime * sin(m_Angle - 0.5f), Shape::TRI);
 }

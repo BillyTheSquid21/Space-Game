@@ -6,6 +6,7 @@
 #include "Game.h"
 #include "Ship.h"
 #include "World.h"
+#include "AI.h"
 
 class SpaceGame : public Game 
 {
@@ -25,6 +26,10 @@ public:
 private:
 	//Stores player ship
 	Ship m_Player;
+
+	//tests ai
+	Ship m_ShipTest;
+	AI m_ShipAI;
 
 	//Keeps track of persistent held input
 	bool m_HeldInput[5];

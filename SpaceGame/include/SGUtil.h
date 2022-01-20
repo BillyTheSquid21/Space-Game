@@ -39,4 +39,20 @@ void EngineLog(std::string message, T value1, T value2) {
 float invSqrt(float number); //Supposedly a faster inv sqrt
 int intFloor(float x); //supposedly faster floor
 
+//return structs
+struct Component2f
+{
+	float a, b;
+};
+
+struct Component3f
+{
+	float a, b, c;
+};
+
+struct Component4f
+{
+	float a, b, c, d;
+};
+
 #endif

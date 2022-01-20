@@ -13,8 +13,8 @@ Chunk::Chunk(int x, int y, Renderer* ren)
 
 void Chunk::makeGrid() {
 	//create grid
-	m_L1 = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + CHUNK_TO_WORLD_FACTOR, 3.4f);
-	m_L2 = CreateLine(m_XPos, m_YPos, m_XPos + CHUNK_TO_WORLD_FACTOR, m_YPos, 3.4f);
+	m_L1 = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + CHUNK_TO_WORLD_FACTOR, 6.8f);
+	m_L2 = CreateLine(m_XPos, m_YPos, m_XPos + CHUNK_TO_WORLD_FACTOR, m_YPos, 6.8f);
 	LayerShape(&m_L1, LAYER_1, Shape::LINE);
 	LayerShape(&m_L2, LAYER_1, Shape::LINE);
 }

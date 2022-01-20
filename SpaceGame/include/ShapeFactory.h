@@ -12,16 +12,6 @@
 #define Tri std::array<Vertex, 3>
 #define Circle std::array<Vertex, 65>
 
-struct Component3f
-{
-	float a, b, c;
-};
-
-struct Component4f
-{
-	float a, b, c, d;
-};
-
 struct Vertex
 {
 	Component3f position;
