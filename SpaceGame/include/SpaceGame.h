@@ -24,12 +24,8 @@ public:
 	void handleScrolling(double xOffset, double yOffset);
 
 private:
-	//Stores player ship
+	//Stores player ship specifically
 	Ship m_Player;
-
-	//tests ai
-	Ship m_ShipTest;
-	AI m_ShipAI;
 
 	//Keeps track of persistent held input
 	bool m_HeldInput[5];

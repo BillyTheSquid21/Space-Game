@@ -9,6 +9,17 @@
 #include "Chunk.h"
 #include "SGPhysics.h"
 
+//Information a physics object needs to interact
+struct WorldShip
+{
+	//Currently only for ships
+	Ship* ship;
+	Planet* closestPlanet;
+	float closestPlanetDistance = 1000000.0f;
+	Star* closestStar;
+	float closestStarDistance = 1000000.0f;
+};
+
 //World container
 class World
 {
@@ -16,7 +27,7 @@ public:
 	World() = default;
 	~World() = default;
 
-	void init(Ship* player);
+	void init();
 
 	//Set renderer
 	void setRenderer(Renderer* ren);
@@ -36,14 +47,17 @@ public:
 	//Does game over things
 	void gameOver();
 
+	//Add ship
+	void addShip(Ship* ship);
+
 private:
 	Renderer* m_Renderer;
 
-	//Stores pointer to player to control
-	Ship* m_PlayerPointer = nullptr;
+	//Stores array of world ships
+	std::vector<WorldShip> m_WorldShips;
 
 	//Applies gravity
-	void applyGravity(Star* closestStar, Planet* closestPlanet);
+	void applyGravity();
 
 	//Loads and unloads objects
 	void unloadChunkObjects(Chunk& chunk);

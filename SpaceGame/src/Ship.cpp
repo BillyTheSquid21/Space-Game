@@ -126,8 +126,6 @@ void Ship::timeOfDeath(double time) {
 
 bool Ship::death(double deltaTime) {
 	if (m_DeathTimer > m_TimeOfDeath) {
-		delete m_DeathAnimation;
-		m_DeathAnimation = nullptr; //prevents delete in destructor calling on undefined memory
 		return true;
 	}
 	//add delta time to death

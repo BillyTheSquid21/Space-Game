@@ -1,13 +1,10 @@
 #include "World.h"
 
 //world
-void World::init(Ship* player) {
+void World::init() {
 	//allocate vector
 	m_ChunkList.resize(CHUNK_CYCLES_TOTAL);
 	m_ChunkIDCache.resize(CHUNK_CYCLES_TOTAL);
-
-	//set pointer for player
-	m_PlayerPointer = player;
 }
 
 void World::setRenderer(Renderer* ren) {
@@ -269,6 +266,7 @@ void World::manageChunks(ChunkLocation originChunk)
 			}
 		}
 	}
+
 	//Sees if a star should be generated
 	checkStarGen();
 
@@ -303,65 +301,74 @@ void World::render() {
 
 bool World::update(double deltaTime, double time) {
 
+	//set all distances for closest objects to max and stars to nullptr
+	for (int i = 0; i < m_WorldShips.size(); i++) {
+		m_WorldShips[i].closestPlanet = nullptr;
+		m_WorldShips[i].closestPlanetDistance = 1000000.0f;
+		m_WorldShips[i].closestStar = nullptr;
+		m_WorldShips[i].closestStarDistance = 1000000.0f;
+	}
+
 	//update stars
-	Star* closestStar = nullptr;
-	float closestStarDistance = 1000000.0f;
 	for (int i = 0; i < m_StarsList.size(); i++) {
 		//update star
 		m_StarsList[i].update(deltaTime);
 
-		//Check if collision has happened
-		if (CircleCollision(m_PlayerPointer->triangle(), GetVerticesCount(Shape::TRI),
-			m_StarsList[i].xPos(), m_StarsList[i].yPos(), m_StarsList[i].radius())) {
+		for (int shipCount = 0; shipCount < m_WorldShips.size(); shipCount++) {
+			//Check if collision has happened
+			if (CircleCollision(m_WorldShips[shipCount].ship->triangle(), GetVerticesCount(Shape::TRI),
+				m_StarsList[i].xPos(), m_StarsList[i].yPos(), m_StarsList[i].radius())) {
 
-			//Do collision here
-			if (!m_PlayerPointer->dying()) {
-				m_PlayerPointer->timeOfDeath(time);
+				//Do collision here
+				if (!m_WorldShips[shipCount].ship->dying()) {
+					m_WorldShips[shipCount].ship->timeOfDeath(time);
+				}
 			}
-		}
 
-		//see what star is closest
-		float distance = CalculateDistance(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
-			m_StarsList[i].xPos(), m_StarsList[i].yPos());
+			//see what star is closest
+			float distance = CalculateDistance(m_WorldShips[shipCount].ship->xPos(), m_WorldShips[shipCount].ship->yPos(),
+				m_StarsList[i].xPos(), m_StarsList[i].yPos());
 
-		if (distance < closestStarDistance) {
-			closestStarDistance = distance;
-			closestStar = &m_StarsList[i];
+			if (distance < m_WorldShips[shipCount].closestStarDistance) {
+				m_WorldShips[shipCount].closestStarDistance = distance;
+				m_WorldShips[shipCount].closestStar = &m_StarsList[i];
+			}
 		}
 	}
 
 	//update planets and find closest to ship
-	Planet* closestPlanet = nullptr;
-	float closestPlanetDistance = 1000000.0f;
 	for (int i = 0; i < m_PlanetsList.size(); i++) {
 		//update planet
 		m_PlanetsList[i].update(deltaTime);
 
-		//Check if collision has happened
-		if (CircleCollision(m_PlayerPointer->triangle(), GetVerticesCount(Shape::TRI),
-			m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos(), m_PlanetsList[i].radius())) {
+		for (int shipCount = 0; shipCount < m_WorldShips.size(); shipCount++) {
 
-			//do collision here
-			if (!m_PlayerPointer->dying()) {
-				m_PlayerPointer->timeOfDeath(time);
+			//Check if collision has happened
+			if (CircleCollision(m_WorldShips[shipCount].ship->triangle(), GetVerticesCount(Shape::TRI),
+				m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos(), m_PlanetsList[i].radius())) {
+
+				//do collision here
+				if (!m_WorldShips[shipCount].ship->dying()) {
+					m_WorldShips[shipCount].ship->timeOfDeath(time);
+				}
 			}
-		}
 
-		//see what planet is closest
-		float distance = CalculateDistance(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
-			m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos());
-		if (distance < closestPlanetDistance) {
-			closestPlanetDistance = distance;
-			closestPlanet = &m_PlanetsList[i];
+			//see what planet is closest for gravity
+			float distance = CalculateDistance(m_WorldShips[shipCount].ship->xPos(), 
+				m_WorldShips[shipCount].ship->yPos(), m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos());
+			if (distance < m_WorldShips[shipCount].closestPlanetDistance) {
+				m_WorldShips[shipCount].closestPlanetDistance = distance;
+				m_WorldShips[shipCount].closestPlanet = &m_PlanetsList[i];
+			}
 		}
 	}
 
 	//Applies gravity
-	applyGravity(closestStar, closestPlanet);
+	applyGravity();
 
-	//run dying animation
-	if (m_PlayerPointer->dying()) {
-		if (m_PlayerPointer->death(deltaTime)) {
+	//updates dying animation for ship at index 0 - location of player
+	if (m_WorldShips[0].ship->dying()) {
+		if (m_WorldShips[0].ship->death(deltaTime)) {
 			gameOver();
 			return false;
 		}
@@ -369,18 +376,22 @@ bool World::update(double deltaTime, double time) {
 	return true;
 }
 
-void World::applyGravity(Star* closestStar, Planet* closestPlanet) {
-	//apply gravity for closest planet
-	if (closestPlanet != NULL) {
-		Force gravity = CalculateGravity(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
-			closestPlanet->xPos(), closestPlanet->yPos(), closestPlanet->mass());
-		m_PlayerPointer->accelerate(gravity.magnitude, gravity.direction);
-	}
-	//apply gravity for closest star
-	if (closestStar != NULL) {
-		Force gravity = CalculateGravity(m_PlayerPointer->xPos(), m_PlayerPointer->yPos(),
-			closestStar->xPos(), closestStar->yPos(), closestStar->mass());
-		m_PlayerPointer->accelerate(gravity.magnitude, gravity.direction);
+void World::applyGravity() {
+	for (int i = 0; i < m_WorldShips.size(); i++) {
+		//apply gravity for closest planet
+		if (m_WorldShips[i].closestPlanet != NULL) {
+			Force gravity = CalculateGravity(m_WorldShips[i].ship->xPos(), m_WorldShips[i].ship->yPos(),
+				m_WorldShips[i].closestPlanet->xPos(), m_WorldShips[i].closestPlanet->yPos(), 
+				m_WorldShips[i].closestPlanet->mass());
+			m_WorldShips[i].ship->accelerate(gravity.magnitude, gravity.direction);
+		}
+		//apply gravity for closest star
+		if (m_WorldShips[i].closestStar != NULL) {
+			Force gravity = CalculateGravity(m_WorldShips[i].ship->xPos(), m_WorldShips[i].ship->yPos(),
+				m_WorldShips[i].closestStar->xPos(), m_WorldShips[i].closestStar->yPos(), 
+				m_WorldShips[i].closestStar->mass());
+			m_WorldShips[i].ship->accelerate(gravity.magnitude, gravity.direction);
+		}
 	}
 }
 
@@ -441,7 +452,7 @@ void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance)
 	}
 
 	//make angle facing away from player - means planets wont suddenly pop in in front of player
-	angle = m_PlayerPointer->direction();
+	angle = m_WorldShips[0].ship->direction();
 
 	//randomise velocity - between 0.5 units and 10
 	velocity = ((float)(rand() % 100000) / 100000.0f) + 0.00001f;
@@ -457,9 +468,15 @@ void World::generatePlanet(Star* parent, Chunk& chunk, float orbitDistance)
 void World::gameOver()
 {
 	//set ship position to origin
-	m_PlayerPointer->position(0.0f, 0.0f);
-	m_PlayerPointer->resetRotation();
+	m_WorldShips[0].ship->position(0.0f, 0.0f);
+	m_WorldShips[0].ship->resetRotation();
 
 	//set speed to 0
-	m_PlayerPointer->resetSpeed();
+	m_WorldShips[0].ship->resetSpeed();
+}
+
+//Add ship
+void World::addShip(Ship* ship) {
+	WorldShip shipData = { ship, nullptr, 1000000.0f, nullptr, 1000000.0f };
+	m_WorldShips.push_back(shipData);
 }

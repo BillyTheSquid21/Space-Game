@@ -30,4 +30,10 @@ protected:
 	World* m_World = nullptr;
 };
 
+struct AIShip
+{
+	Ship ship;
+	AI ai;
+};
+
 #endif
