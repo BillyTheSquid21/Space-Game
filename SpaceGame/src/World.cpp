@@ -5,6 +5,10 @@ void World::init() {
 	//allocate vector
 	m_ChunkList.resize(CHUNK_CYCLES_TOTAL);
 	m_ChunkIDCache.resize(CHUNK_CYCLES_TOTAL);
+
+	Ship ship = Ship::Ship();
+	WorldShip shipTemp = { &ship, nullptr, 1000000.0f, nullptr, 1000000.0f };
+	m_WorldShips.push_back(shipTemp);
 }
 
 void World::setRenderer(Renderer* ren) {
@@ -297,18 +301,75 @@ void World::render() {
 	for (int i = 0; i < m_PlanetsList.size(); i++) {
 		m_PlanetsList[i].render();
 	}
+	//draw projectiles
+	for (int i = 0; i < MAX_PROJECTILES; i++) {
+		if (m_ProjectileManager.index[i].type != ObjectType::Null) {
+			m_ProjectileManager.bullets[i].render();
+		}
+	}
 }
 
 bool World::update(double deltaTime, double time) {
 
-	//set all distances for closest objects to max and stars to nullptr
-	for (int i = 0; i < m_WorldShips.size(); i++) {
-		m_WorldShips[i].closestPlanet = nullptr;
-		m_WorldShips[i].closestPlanetDistance = 1000000.0f;
-		m_WorldShips[i].closestStar = nullptr;
-		m_WorldShips[i].closestStarDistance = 1000000.0f;
-	}
+	//Updates all physics objects, both static and dynamic
+	updatePhysicsBodies(deltaTime, time);
 
+	//Applies gravity
+	applyGravity();
+
+	//Handles ai death and removes dead ships if player not dying, game can then rebuild ship and add
+	aiDeath();
+
+	//deals with player death and returns whether to reset world
+	return playerDeath(deltaTime);
+}
+
+void World::updatePhysicsBodies(double deltaTime, double time) {
+	//set all distances for closest objects to max and stars to nullptr
+	resetShipClosestPhysicsBodies();
+
+	//update stars and influences
+	updatePhysicsStars(deltaTime, time);
+
+	//update planets and influences
+	updatePhysicsPlanets(deltaTime, time);
+
+	//update bullets and collision
+	updatePhysicsBullets(deltaTime, time);
+}
+
+void World::updatePhysicsBullets(double deltaTime, double time) {
+	//update bullets
+	for (int i = 0; i < m_WorldShips.size(); i++) {
+		//check if ship has shot
+		if (m_WorldShips[i].ship->hasShot() && !m_WorldShips[i].ship->dying()) {
+			float direction = m_WorldShips[i].ship->direction() + SG_PI / 2;
+			float xPos = m_WorldShips[i].ship->xPos() + 200.0f * cos(direction);
+			float yPos = m_WorldShips[i].ship->yPos() + 200.0f * sin(direction);
+			Bullet bullet = Bullet::Bullet(xPos, yPos, m_WorldShips[i].ship->veloctiy() + 4500.0f, direction);
+			bullet.setRenderer(m_Renderer);
+			m_ProjectileManager.addBullet(bullet);
+		}
+		//check if ship has been shot
+		for (int j = 0; j < MAX_PROJECTILES; j++) {
+			if (m_ProjectileManager.index[j].type == ObjectType::Null) {
+				continue;
+			}
+			Component3f bulletProperties = m_ProjectileManager.bullets[j].bullet();
+			if (CircleCollision(m_WorldShips[i].ship->xPos(), m_WorldShips[i].ship->yPos(), 80.0f,
+				bulletProperties.a, bulletProperties.b, bulletProperties.c)) {
+				m_ProjectileManager.removeBullet(j);
+				EngineLog("HIT: ", i);
+				if (m_WorldShips[i].ship->hit() && !m_WorldShips[i].ship->dying()) {
+					m_WorldShips[i].ship->timeOfDeath(time);
+				}
+			}
+		}
+	}
+	m_ProjectileManager.update(deltaTime);
+}
+
+void World::updatePhysicsStars(double deltaTime, double time) {
 	//update stars
 	for (int i = 0; i < m_StarsList.size(); i++) {
 		//update star
@@ -316,7 +377,7 @@ bool World::update(double deltaTime, double time) {
 
 		for (int shipCount = 0; shipCount < m_WorldShips.size(); shipCount++) {
 			//Check if collision has happened
-			if (CircleCollision(m_WorldShips[shipCount].ship->triangle(), GetVerticesCount(Shape::TRI),
+			if (PolygonCircleCollision(m_WorldShips[shipCount].ship->triangle(), GetVerticesCount(Shape::TRI),
 				m_StarsList[i].xPos(), m_StarsList[i].yPos(), m_StarsList[i].radius())) {
 
 				//Do collision here
@@ -335,7 +396,9 @@ bool World::update(double deltaTime, double time) {
 			}
 		}
 	}
+}
 
+void World::updatePhysicsPlanets(double deltaTime, double time) {
 	//update planets and find closest to ship
 	for (int i = 0; i < m_PlanetsList.size(); i++) {
 		//update planet
@@ -344,7 +407,7 @@ bool World::update(double deltaTime, double time) {
 		for (int shipCount = 0; shipCount < m_WorldShips.size(); shipCount++) {
 
 			//Check if collision has happened
-			if (CircleCollision(m_WorldShips[shipCount].ship->triangle(), GetVerticesCount(Shape::TRI),
+			if (PolygonCircleCollision(m_WorldShips[shipCount].ship->triangle(), GetVerticesCount(Shape::TRI),
 				m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos(), m_PlanetsList[i].radius())) {
 
 				//do collision here
@@ -354,7 +417,7 @@ bool World::update(double deltaTime, double time) {
 			}
 
 			//see what planet is closest for gravity
-			float distance = CalculateDistance(m_WorldShips[shipCount].ship->xPos(), 
+			float distance = CalculateDistance(m_WorldShips[shipCount].ship->xPos(),
 				m_WorldShips[shipCount].ship->yPos(), m_PlanetsList[i].xPos(), m_PlanetsList[i].yPos());
 			if (distance < m_WorldShips[shipCount].closestPlanetDistance) {
 				m_WorldShips[shipCount].closestPlanetDistance = distance;
@@ -362,13 +425,32 @@ bool World::update(double deltaTime, double time) {
 			}
 		}
 	}
+}
 
-	//Applies gravity
-	applyGravity();
+void World::resetShipClosestPhysicsBodies() {
+	//set all distances for closest objects to max and stars to nullptr
+	for (int i = 0; i < m_WorldShips.size(); i++) {
+		m_WorldShips[i].closestPlanet = nullptr;
+		m_WorldShips[i].closestPlanetDistance = 1000000.0f;
+		m_WorldShips[i].closestStar = nullptr;
+		m_WorldShips[i].closestStarDistance = 1000000.0f;
+	}
+}
 
+void World::aiDeath() {
+	//checks if ships are dead before removing them
+	for (int i = 2; i < m_WorldShips.size(); i++) {
+		if (m_WorldShips[i].ship->death() && !m_WorldShips[1].ship->dying()) {
+			m_WorldShips.erase(m_WorldShips.begin() + i);
+			i--;
+		}
+	}
+}
+
+bool World::playerDeath(double deltaTime) {
 	//updates dying animation for ship at index 0 - location of player
-	if (m_WorldShips[0].ship->dying()) {
-		if (m_WorldShips[0].ship->death(deltaTime)) {
+	if (m_WorldShips[1].ship->dying()) {
+		if (m_WorldShips[1].ship->death(deltaTime)) {
 			gameOver();
 			return false;
 		}
@@ -479,4 +561,18 @@ void World::gameOver()
 void World::addShip(Ship* ship) {
 	WorldShip shipData = { ship, nullptr, 1000000.0f, nullptr, 1000000.0f };
 	m_WorldShips.push_back(shipData);
+}
+
+void World::setShip(Ship* ship, unsigned int index) {
+	WorldShip shipData = { ship, nullptr, 1000000.0f, nullptr, 1000000.0f };
+	m_WorldShips[index] = shipData;
+}
+
+bool World::shipsInSync(unsigned int size) {
+	EngineLog("Game: ", size);
+	EngineLog("World: ", m_WorldShips.size());
+	if (size <= m_WorldShips.size()) {
+		return true;
+	}
+	return false;
 }

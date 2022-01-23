@@ -5,11 +5,11 @@ Ship::Ship(float size, Component3f color)
 	: m_Ship{ CreateTri(0.0f, 0.0f, size) }, m_Direction{ CreateLine(0.0f,0.0f, 0.0f, 130.0f, 6.0f) }
 {
 	m_Size = size;
-	r = color.a;
-	g = color.b;
-	b = color.c;
-	ColorShape(&m_Ship, r, g, b, Shape::TRI);
-	ColorShape(&m_Direction, b, 0.1f, 0.1f, Shape::LINE);
+	m_Red = color.a;
+	m_Green = color.b;
+	m_Blue = color.c;
+	ColorShape(&m_Ship, m_Red, m_Green, m_Blue, Shape::TRI);
+	ColorShape(&m_Direction, m_Blue, 0.1f, 0.1f, Shape::LINE);
 	LayerShape(&m_Direction, LAYER_4, Shape::LINE);
 	EngineLog("Ship Created at 0.0, 0.0!");
 }
@@ -33,6 +33,9 @@ void Ship::update(double deltaTime) {
 
 	//move with velocity
 	translate(m_VelocityX * deltaTime, m_VelocityY * deltaTime);
+
+	//update bullets
+	canShoot(deltaTime);
 
 	//locate current chunk
 	m_CurrentChunk = LocateChunk(m_XPos, m_YPos);
@@ -114,14 +117,50 @@ void Ship::timeOfDeath(double time) {
 
 	//color death animation
 	m_DeathAnimation = new ShipDeath(m_Size / 2);
-	ColorShape(&m_DeathAnimation->m_Tri1, r, g, b, Shape::TRI);
-	ColorShape(&m_DeathAnimation->m_Tri2, r, g, b, Shape::TRI);
-	ColorShape(&m_DeathAnimation->m_Tri3, r, g, b, Shape::TRI);
+	ColorShape(&m_DeathAnimation->m_Tri1, m_Red, m_Green, m_Blue, Shape::TRI);
+	ColorShape(&m_DeathAnimation->m_Tri2, m_Red, m_Green, m_Blue, Shape::TRI);
+	ColorShape(&m_DeathAnimation->m_Tri3, m_Red, m_Green, m_Blue, Shape::TRI);
 
 	//activate death animation
 	m_DeathAnimation->startDeath(xPos(), yPos(), travelDirection(), veloctiy());
 	//set renderer for animation
 	m_DeathAnimation->setRenderer(m_Renderer);
+}
+
+void Ship::shoot() {
+	if (ableToShoot) {
+		shot = true;
+	}
+}
+
+bool Ship::hasShot() {
+	if (shot) {
+		shot = false;
+		ableToShoot = false;
+		timeSinceShot = 0.0;
+		return true;
+	}
+	return false;
+}
+
+void Ship::canShoot(double deltaTime) {
+	timeSinceShot += deltaTime;
+	if (timeSinceShot > cooldown) {
+		ableToShoot = true;
+	}
+}
+
+bool Ship::hit() {
+	if (hitCount > 2) {
+		return true;
+	}
+	hitCount++;
+
+	//color ship
+	m_Red *= 1.4f;
+	m_Green *= 1.2f;
+	m_Blue *= 1.2f;
+	ColorShape(&m_Ship, m_Red, m_Green, m_Blue, Shape::TRI);
 }
 
 bool Ship::death(double deltaTime) {
@@ -139,63 +178,70 @@ bool Ship::death(double deltaTime) {
 	return false;
 }
 
+bool Ship::death() {
+	if (m_DeathTimer > m_TimeOfDeath) {
+		return true;
+	}
+	return false;
+}
+
 void Ship::DoTheFunky(float dt) {
 	float speed = 2.0f;
 	//red
-	if (rUp) {
-		if (r < 1.0f) {
-			r += speed * dt;
+	if (m_RedUp) {
+		if (m_Red < 1.0f) {
+			m_Red += speed * dt;
 		}
 		else {
-			rUp = false;
+			m_RedUp = false;
 		}
 	}
 	else {
-		if (r > 0.0f) {
-			r -= speed * dt;
+		if (m_Red > 0.0f) {
+			m_Red -= speed * dt;
 		}
 		else {
-			rUp = true;
+			m_RedUp = true;
 		}
 	}
 	//green
-	if (gUp) {
-		if (g < 1.0f) {
-			g += speed * dt;
+	if (m_GreenUp) {
+		if (m_Green < 1.0f) {
+			m_Green += speed * dt;
 		}
 		else {
-			gUp = false;
+			m_GreenUp = false;
 		}
 	}
 	else {
-		if (g > 0.0f) {
-			g -= speed * dt;
+		if (m_Green > 0.0f) {
+			m_Green -= speed * dt;
 		}
 		else {
-			gUp = true;
+			m_GreenUp = true;
 		}
 	}
 	//bloo
-	if (bUp) {
-		if (b < 1.0f) {
-			b += speed * dt;
+	if (m_BlueUp) {
+		if (m_Blue < 1.0f) {
+			m_Blue += speed * dt;
 		}
 		else {
-			bUp = false;
+			m_BlueUp = false;
 		}
 	}
 	else {
-		if (b > 0.0f) {
-			b -= speed * dt;
+		if (m_Blue > 0.0f) {
+			m_Blue -= speed * dt;
 		}
 		else {
-			bUp = true;
+			m_BlueUp = true;
 		}
 	}
 
-	ColorShapeVertex(&m_Ship, 0, r, g, b, Shape::TRI);
-	ColorShapeVertex(&m_Ship, 1, g, b, r, Shape::TRI);
-	ColorShapeVertex(&m_Ship, 2, b, r, g, Shape::TRI);
+	ColorShapeVertex(&m_Ship, 0, m_Red, m_Green, m_Blue, Shape::TRI);
+	ColorShapeVertex(&m_Ship, 1, m_Green, m_Blue, m_Red, Shape::TRI);
+	ColorShapeVertex(&m_Ship, 2, m_Blue, m_Red, m_Green, Shape::TRI);
 }
 
 //ship death

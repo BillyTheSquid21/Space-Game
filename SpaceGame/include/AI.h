@@ -31,9 +31,9 @@ protected:
 };
 
 struct AIShip
-{
-	Ship ship;
-	AI ai;
+{	
+	Ship* ship;
+	AI* ai;
 };
 
 #endif

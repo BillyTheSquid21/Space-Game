@@ -49,12 +49,24 @@ public:
 
 	//Add ship
 	void addShip(Ship* ship);
+	void setShip(Ship* ship, unsigned int index);
+	bool shipsInSync(unsigned int size); //check to make sure ship lists are in sync
 
 private:
 	Renderer* m_Renderer;
 
 	//Stores array of world ships
 	std::vector<WorldShip> m_WorldShips;
+	ProjectileManager m_ProjectileManager;
+
+	//Helper functions
+	void resetShipClosestPhysicsBodies();
+	void updatePhysicsBodies(double deltaTime, double time);
+	void updatePhysicsStars(double deltaTime, double time);
+	void updatePhysicsPlanets(double deltaTime, double time);
+	void updatePhysicsBullets(double deltaTime, double time);
+	bool playerDeath(double deltaTime);
+	void aiDeath();
 
 	//Applies gravity
 	void applyGravity();

@@ -20,7 +20,7 @@ float CalculateDistance(float x1, float y1, float x2, float y2);
 float CalculateAngle(float x1, float y1, float x2, float y2);
 Force CalculateGravity(float x1, float y1, float x2, float y2, float mass);
 
-//Collision
-bool CircleCollision(void* polygon, unsigned int verticeCount, float xCircle, float yCircle, float radius);
-
+//Collision - polygon circle for if a small object is inside, and is quick and dirty
+bool PolygonCircleCollision(void* polygon, unsigned int verticeCount, float xCircle, float yCircle, float radius);
+bool CircleCollision(float x, float y, unsigned int hitCircleRadius, float xCircle, float yCircle, float radius);
 #endif

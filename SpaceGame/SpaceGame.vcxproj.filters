@@ -60,6 +60,9 @@
     <ClCompile Include="src\AI.cpp">
       <Filter>Source Files\Game Specific</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bullets.cpp">
+      <Filter>Source Files\Game Specific</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SGUtil.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="include\AI.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bullets.h">
+      <Filter>Header Files\Game Specific</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -21,7 +21,7 @@ float CalculateAngle(float x1, float y1, float x2, float y2) {
 	return direction;
 }
 
-bool CircleCollision(void* polygon, unsigned int verticeCount, float xCircle, float yCircle, float radius) {
+bool PolygonCircleCollision(void* polygon, unsigned int verticeCount, float xCircle, float yCircle, float radius) {
 	Vertex* verticePointer = (Vertex*)polygon;
 	//if any vertice is within radius, has collided
 	for (int i = 0; i < verticeCount; i++) {
@@ -31,5 +31,15 @@ bool CircleCollision(void* polygon, unsigned int verticeCount, float xCircle, fl
 			return true;
 		}
 	}
+	return false;
+}
+
+//Polygon size is how big the hit circle will be
+bool CircleCollision(float x, float y, unsigned int hitCircleRadius, float xCircle, float yCircle, float radius) {
+	float distance = CalculateDistance(x, y, xCircle, yCircle);
+	if (distance < hitCircleRadius + radius) {
+		return true;
+	}
+
 	return false;
 }

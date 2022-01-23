@@ -3,21 +3,12 @@
 bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback sCallback) {
 	bool initSuccess = Game::init(name, kCallback, sCallback);
 
-	//create ship
-	m_Player = Ship(100.0f, { 0.094f, 0.584f, 0.604f });
-	m_Player.setRenderer(&m_Renderer);
-
-	//init world
-	m_World.init();
-	m_World.setRenderer(&m_Renderer);
-	m_World.initialGenerateChunks();
-
 	//init renderer
 	m_Renderer.camera.setZoomCamera(0.1f);
-	m_ZoomLevel = 0.1;
+	m_ZoomLevel = 0.1f;
 
-	//add ships to world
-	m_World.addShip(&m_Player);
+	//make world
+	createWorld();
 
 	return initSuccess;
 }
@@ -26,6 +17,11 @@ void SpaceGame::render() {
 	//commit primitives and check bounds and stuff here
 	m_Player.render();
 	m_World.render();
+
+	//update ships
+	for (int i = 0; i < m_EnemyShips.size(); i++) {
+		m_EnemyShips[i].render();
+	}
 
 	Game::render(); //call at bottom to inherit method
 }
@@ -51,6 +47,9 @@ void SpaceGame::update(double deltaTime) {
 		m_Player.resetRotation();
 		m_Player.rotate(m_Player.travelDirection() - SG_PI / 2); //Ship is off by 90 deg as relative to vertical axis
 	}
+	if (HELD_CTRL) {
+		m_Player.shoot();
+	}
 	m_Player.update(deltaTime);
 
 	//world update
@@ -61,26 +60,26 @@ void SpaceGame::update(double deltaTime) {
 
 	//if update returns false, reset world
 	if (!m_World.update(deltaTime, m_GlfwTime)) {
-
-		//create new ship
-		m_Player = Ship(100.0f, { 0.094f, 0.584f, 0.604f });
-		m_Player.setRenderer(&m_Renderer);
-
 		//create new world
-		m_World = World();
-		
-		//init world
-		m_World.init();
-		m_World.setRenderer(&m_Renderer);
-		m_World.initialGenerateChunks();
-
-		//add ships to world
-		m_World.addShip(&m_Player);
+		createWorld();
 	}
 
 	//camera
 	m_Renderer.camera.positionCamera(-m_Player.xPos() * m_ZoomLevel, -m_Player.yPos() * m_ZoomLevel);
 
+	//update ships
+	for (int i = 0; i < m_EnemyShips.size(); i++) {
+		m_EnemyShips[i].update(deltaTime);
+		m_EnemyAI[i].update(deltaTime);
+		
+		//death animation
+		if (m_EnemyShips[i].dying()) {
+			if (m_EnemyShips[i].death(deltaTime) && !m_Player.dying()) {
+				setEnemy(i);
+			}
+		}
+	}
+	
 	//inherits
 	Game::update(deltaTime);
 }
@@ -144,6 +143,16 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 			HELD_SHIFT = false;
 		}
 	}
+
+	if (key == GLFW_KEY_LEFT_CONTROL) {
+		if (action == GLFW_PRESS) {
+			m_Player.shoot();
+			HELD_CTRL = true;
+		}
+		else if (action == GLFW_RELEASE) {
+			HELD_CTRL = false;
+		}
+	}
 }
 
 void SpaceGame::handleScrolling(double xOffset, double yOffset) {
@@ -155,4 +164,74 @@ void SpaceGame::handleScrolling(double xOffset, double yOffset) {
 		m_Renderer.camera.zoomCamera(-0.005f);
 		m_ZoomLevel += -0.005f;
 	}
+}
+
+void SpaceGame::createEnemy(float xPos, float yPos) {
+	//allocate ship and set properties
+	Ship tempShipPtr = Ship::Ship(100.0f, { 0.92f, 0.12f, 0.22f });
+	tempShipPtr.setRenderer(&m_Renderer);
+	tempShipPtr.setMaxSpeed(15000.0f);
+	tempShipPtr.position(xPos, yPos);
+
+	m_EnemyShips.push_back(tempShipPtr);
+	m_World.addShip(&m_EnemyShips[m_EnemyShips.size() - 1]);
+
+	//make ai
+	AI tempAIPtr = AI::AI(&m_Player, &m_EnemyShips[m_EnemyShips.size() - 1]);
+	tempAIPtr.setWorld(&m_World);
+	m_EnemyAI.push_back(tempAIPtr);
+
+	//set all previous ai
+	for (int i = 0; i < m_EnemyShips.size() - 1; i++) {
+		AI tempAIPtr = AI::AI(&m_Player, &m_EnemyShips[i]);
+		tempAIPtr.setWorld(&m_World);
+		m_EnemyAI[i] = tempAIPtr;
+	}
+
+	//set all previous worlds
+	for (int i = 0; i < m_EnemyShips.size() - 1; i++) {
+		m_World.setShip(&m_EnemyShips[i], i);
+	}
+}
+
+void SpaceGame::setEnemy(unsigned int index) {
+
+	//allocate ship and set properties
+	Ship tempShipPtr = Ship::Ship(100.0f, { 0.92f, 0.12f, 0.22f });
+	tempShipPtr.setRenderer(&m_Renderer);
+	tempShipPtr.setMaxSpeed(15000.0f);
+
+	m_EnemyShips[index] = tempShipPtr;
+	m_World.addShip(&m_EnemyShips[index]);
+
+	//make ai
+	AI tempAIPtr = AI::AI(&m_Player, &m_EnemyShips[index]);
+	tempAIPtr.setWorld(&m_World);
+	m_EnemyAI[index] = tempAIPtr;
+}
+
+void SpaceGame::createWorld() {
+	//clear enemies
+	m_EnemyShips.clear();
+	m_EnemyAI.clear();
+
+	//create new ship
+	m_Player = Ship(100.0f, { 0.094f, 0.584f, 0.604f });
+	m_Player.setRenderer(&m_Renderer);
+
+	//create new world
+	m_World = World();
+
+	//init world
+	m_World.init();
+	m_World.setRenderer(&m_Renderer);
+	m_World.initialGenerateChunks();
+
+	//add ships to world
+	m_World.addShip(&m_Player);
+
+
+	//add enemy ships
+	createEnemy(-800.0f, -800.0f);
+	createEnemy(800.0f, -800.0f);
 }

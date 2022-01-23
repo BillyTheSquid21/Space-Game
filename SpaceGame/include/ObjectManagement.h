@@ -12,7 +12,10 @@ enum class ObjectType
 	Ship,
 
 	//Orbitals
-	Star, Planet
+	Star, Planet,
+
+	//Physics
+	Projectile
 };
 
 //Define null object

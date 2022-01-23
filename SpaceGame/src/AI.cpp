@@ -1,8 +1,7 @@
 #include "AI.h"
 
-AI::AI(Ship* target, Ship* assignedShip) 
+AI::AI(Ship* target, Ship* assignedShip)
 	: m_Target{ target }, m_ShipControlling{ assignedShip } {
-
 }
 
 void AI::setWorld(World* world) {

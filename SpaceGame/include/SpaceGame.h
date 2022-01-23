@@ -27,8 +27,17 @@ private:
 	//Stores player ship specifically
 	Ship m_Player;
 
+	//Enemy ships
+	std::vector<Ship> m_EnemyShips;
+	std::vector<AI> m_EnemyAI;
+	void createEnemy(float xPos, float yPos);
+	void setEnemy(unsigned int index);
+
+	//Helper functions
+	void createWorld();
+
 	//Keeps track of persistent held input
-	bool m_HeldInput[5];
+	bool m_HeldInput[6];
 
 	//Zoom level for transforming transformations
 	float m_ZoomLevel = 1.0f;
@@ -46,5 +55,6 @@ private:
 #define HELD_W m_HeldInput[2]
 #define HELD_SPACE m_HeldInput[3]
 #define HELD_SHIFT m_HeldInput[4]
+#define HELD_CTRL m_HeldInput[5]
 
 #endif

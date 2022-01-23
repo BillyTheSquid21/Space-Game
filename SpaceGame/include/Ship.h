@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "Chunk.h"
 #include "SGPhysics.h"
+#include "Bullets.h"
 
 //Object that plays a short animation on ship death
 static class ShipDeath : public GameObject
@@ -50,6 +51,11 @@ public:
 	void resetRotation();
 	void position(float xNew, float yNew);
 
+	//Fighting
+	void shoot();	//triggers from button input
+	bool hit();
+	bool hasShot(); //if ship has shot, bullet is added to world
+
 	//Kinematics
 	void accelerate(float a);
 	void accelerate(float a, float angle);
@@ -60,6 +66,7 @@ public:
 	//Animation
 	void timeOfDeath(double time);
 	bool death(double deltaTime);
+	bool death(); //version for not updating animation
 
 	//Getters - travel direction adds 90 degrees for consistency
 	float direction() const { return m_CumulativeAngle; }
@@ -94,18 +101,26 @@ private:
 	float m_Size = 0.0f;
 
 	//Death
+	unsigned char hitCount = 0;
 	double m_TimeOfDeath = 0.0;
 	double m_DeathTimer = 0.0;
 	bool m_Dying = false;
 	ShipDeath* m_DeathAnimation = nullptr;
 
 	//Color
-	float r;
-	float g;
-	float b;
-	bool rUp = true;
-	bool bUp = true;
-	bool gUp = false;
+	float m_Red;
+	float m_Green;
+	float m_Blue;
+	bool m_RedUp = true;
+	bool m_BlueUp = true;
+	bool m_GreenUp = false;
+
+	//Bullets
+	bool shot = false;
+	bool ableToShoot = false;
+	void canShoot(double deltaTime);
+	double timeSinceShot = 0.0;
+	double cooldown = 0.1;
 
 	//Drawing
 	void DoTheFunky(float dt);
