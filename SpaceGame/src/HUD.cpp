@@ -1,12 +1,11 @@
 #include "HUD.h"
 
 HUD::HUD()
-	: m_XPos{ -580.0f }, m_YPos(-200.0f) 
 {
 	//HUD initialisation
-	compass = CreateRing(-580.0f, -200.0f, 80.0f, 2.5f);
-	directionFacing = CreateLine(-580.0f, -200.0f, -580.0f, -120.0f, 2.5f);
-	directionMoving = CreateLine(-580.0f, -200.0f, -580.0f, -120.0f, 2.5f);
+	compass = CreateRing(m_XPos, m_YPos, 80.0f, 2.5f);
+	directionFacing = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + 80.0f, 2.5f);
+	directionMoving = CreateLine(m_XPos, m_YPos, m_XPos, m_YPos + 80.0f, 2.5f);
 
 	//Color facing same color as ship
 	ColorShape(&directionFacing, 0.094f, 0.584f, 0.604f, Shape::LINE);
@@ -22,10 +21,10 @@ HUD::HUD()
 	LayerShape(&directionMoving, GUI_LAYER_2, Shape::LINE);
 	LayerShape(&compass, GUI_LAYER_3, Shape::RING);
 
-	//Make 50% transparent
-	TransparencyShape(&directionFacing, 0.5f, Shape::LINE);
-	TransparencyShape(&directionMoving, 0.5f, Shape::LINE);
-	TransparencyShape(&compass, 0.5f, Shape::RING);
+	//Make 60% transparent
+	TransparencyShape(&directionFacing, 0.6f, Shape::LINE);
+	TransparencyShape(&directionMoving, 0.6f, Shape::LINE);
+	TransparencyShape(&compass, 0.6f, Shape::RING);
 }
 
 void HUD::render() {

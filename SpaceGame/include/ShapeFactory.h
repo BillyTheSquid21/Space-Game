@@ -66,6 +66,7 @@ void ColorShapeVertex(void* verticesArray, unsigned int vertex, float r, float g
 void LayerShape(void* verticesArray, float layer, Shape type);
 void ScaleShape(void* verticesArray, float scale, float centreX, float centreY, Shape type);
 void TransparencyShape(void* verticesArray, float alpha, Shape type);
+void TransparencyShapeVertex(void* verticesArray, unsigned int index, float alpha, Shape type);
 
 //Utility
 unsigned short int GetVerticesCount(Shape type);

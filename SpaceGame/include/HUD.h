@@ -21,7 +21,7 @@ private:
 	Ring compass;
 	Line directionFacing;
 	Line directionMoving;
-	float m_XPos; float m_YPos;
+	const float m_XPos = -810.0f; const float m_YPos = -120.0f;
 	float m_CumulativeRotationFacing = 0.0f;
 	float m_CumulativeRotationMoving = 0.0f;
 };

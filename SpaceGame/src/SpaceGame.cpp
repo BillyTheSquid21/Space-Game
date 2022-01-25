@@ -7,6 +7,10 @@ bool SpaceGame::init(const char name[], Key_Callback kCallback, Scroll_Callback 
 	m_Renderer.camera.setZoomCamera(0.1f);
 	m_ZoomLevel = 0.1f;
 
+	//scale gui relative to resultion
+	float scaleFactor = m_Width / 1920.0f;
+	m_Renderer.gui.setScale(scaleFactor);
+
 	//make world
 	createWorld();
 

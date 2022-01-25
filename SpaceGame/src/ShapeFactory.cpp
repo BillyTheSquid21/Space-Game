@@ -276,3 +276,8 @@ void TransparencyShape(void* verticesArray, float alpha, Shape type) {
 		vertices[i].color.d = alpha;
 	}
 }
+
+void TransparencyShapeVertex(void* verticesArray, unsigned int index, float alpha, Shape type) {
+	Vertex* vertices = (Vertex*)verticesArray;
+	vertices[index].color.d = alpha;
+}

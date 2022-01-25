@@ -11,8 +11,9 @@ Bullet::Bullet(float x, float y, float velocity, float angle)
 	//layer shape
 	LayerShape(&m_Glow, LAYER_5, Shape::CIRCLE);
 	//color shape to green
-	ColorShape(&m_Glow, 0.0f, 0.0f, 0.0f, Shape::CIRCLE);
-	ColorShapeVertex(&m_Glow, 0, 0.0f, 1.0f, 0.0f, Shape::CIRCLE);
+	ColorShape(&m_Glow, 0.0f, 1.0f, 0.0f, Shape::CIRCLE);
+	TransparencyShape(&m_Glow, 0.0f, Shape::CIRCLE);
+	TransparencyShapeVertex(&m_Glow, 0, 1.0f, Shape::CIRCLE);
 }
 
 void Bullet::update(double deltaTime) {

@@ -74,7 +74,9 @@ Star::Star(StarInfo star, unsigned int index)
 	//Light circle
 	LayerShape(&m_Light, LAYER_1, Shape::CIRCLE);
 	ColorShape(&m_Light, 0.0f, 0.0f, 0.0f, Shape::CIRCLE);
+	TransparencyShape(&m_Light, 0.64f, Shape::CIRCLE);
 	ColorShapeVertex(&m_Light, 0, 0.2f, 0.2f, 0.2f, Shape::CIRCLE);
+	TransparencyShapeVertex(&m_Light, 0, 1.0f, Shape::CIRCLE);
 }
 
 void Star::update(double deltaTime) {
