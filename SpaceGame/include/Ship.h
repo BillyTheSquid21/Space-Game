@@ -120,7 +120,7 @@ private:
 	bool ableToShoot = false;
 	void canShoot(double deltaTime);
 	double timeSinceShot = 0.0;
-	double cooldown = 0.1;
+	double cooldown = 0.17;
 
 	//Drawing
 	void DoTheFunky(float dt);

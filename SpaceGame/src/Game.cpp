@@ -2,7 +2,6 @@
 
 //Main constructor
 Game::Game(int width, int height) 
-    :m_Renderer{Renderer::Renderer(width, height)}
 {
 	m_Width = width;
 	m_Height = height;
@@ -72,6 +71,10 @@ bool Game::init(const char name[], Key_Callback kCallback, Scroll_Callback sCall
     //depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    //alpha blending
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
 
     return success;
 }

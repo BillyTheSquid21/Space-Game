@@ -2,11 +2,11 @@
 #version 330 core
 
 layout(location = 0) in vec4 position;
-layout(location = 1) in vec3 color;
+layout(location = 1) in vec4 color;
 
 uniform mat4 u_Projection;
 
-out vec3 vColor;
+out vec4 vColor;
 
 void main()
 {	
@@ -17,11 +17,11 @@ void main()
 #shader fragment
 #version 330 core
 
-in vec3 vColor;
+in vec4 vColor;
 
 out vec4 color;
 
 void main()
 {
-	color = vec4(vColor, 1.0f);
+	color = vColor;
 }

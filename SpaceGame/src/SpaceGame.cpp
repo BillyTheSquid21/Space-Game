@@ -23,6 +23,9 @@ void SpaceGame::render() {
 		m_EnemyShips[i].render();
 	}
 
+	//Render HUD
+	m_HUD.render();
+
 	Game::render(); //call at bottom to inherit method
 }
 
@@ -30,11 +33,15 @@ float angle = 0.0f;
 void SpaceGame::update(double deltaTime) {
 
 	//ship
-	if (HELD_A) {
-		m_Player.rotate(6.0f * deltaTime);
+	if (HELD_A && !m_Player.dying()) {
+		float rotation = 6.0f * deltaTime;
+		m_Player.rotate(rotation);
+		m_HUD.rotateDirectionFacing(rotation);
 	}
-	if (HELD_D) {
-		m_Player.rotate(-6.0f * deltaTime);
+	if (HELD_D && !m_Player.dying()) {
+		float rotation = -6.0f * deltaTime;
+		m_Player.rotate(rotation);
+		m_HUD.rotateDirectionFacing(rotation);
 	}
 	if (HELD_W) {
 		m_Player.accelerate(2200.0f * deltaTime);
@@ -43,9 +50,11 @@ void SpaceGame::update(double deltaTime) {
 		m_Player.brake(deltaTime);
 	}
 	//keeps ship pointing in direction of motion
-	if (HELD_SHIFT) {
+	if (HELD_SHIFT && !m_Player.dying()) {
 		m_Player.resetRotation();
 		m_Player.rotate(m_Player.travelDirection() - SG_PI / 2); //Ship is off by 90 deg as relative to vertical axis
+		m_HUD.resetFacing();
+		m_HUD.rotateDirectionFacing(m_Player.travelDirection() - SG_PI / 2);
 	}
 	if (HELD_CTRL) {
 		m_Player.shoot();
@@ -79,6 +88,10 @@ void SpaceGame::update(double deltaTime) {
 			}
 		}
 	}
+
+	//update direction moving hud
+	m_HUD.resetMoving();
+	m_HUD.rotateDirectionMoving(m_Player.travelDirection() - SG_PI / 2);
 	
 	//inherits
 	Game::update(deltaTime);
@@ -93,9 +106,10 @@ void SpaceGame::handleInput(int key, int scancode, int action, int mods) {
 	Game::handleInput(key, scancode, action, mods);
 
 	//put single button directly in here
-	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F && action == GLFW_PRESS && !m_Player.dying()) {
 		m_Player.resetRotation();
 		m_Player.rotate(-m_Player.travelDirection());
+		m_HUD.resetFacing();
 	}
 
 	//held input
@@ -232,6 +246,9 @@ void SpaceGame::createWorld() {
 
 
 	//add enemy ships
-	createEnemy(-800.0f, -800.0f);
-	createEnemy(800.0f, -800.0f);
+	createEnemy(-800.0f, -16000.0f);
+	createEnemy(800.0f, -16000.0f);
+
+	//reset HUD
+	m_HUD.resetFacing();
 }

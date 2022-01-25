@@ -63,6 +63,12 @@
     <ClCompile Include="src\Bullets.cpp">
       <Filter>Source Files\Game Specific</Filter>
     </ClCompile>
+    <ClCompile Include="src\GLClasses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HUD.cpp">
+      <Filter>Source Files\Game Specific</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SGUtil.h">
@@ -105,6 +111,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bullets.h">
+      <Filter>Header Files\Game Specific</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GLClasses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vertex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HUD.h">
       <Filter>Header Files\Game Specific</Filter>
     </ClInclude>
   </ItemGroup>

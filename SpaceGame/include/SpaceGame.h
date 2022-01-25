@@ -7,6 +7,7 @@
 #include "Ship.h"
 #include "World.h"
 #include "AI.h"
+#include "HUD.h"
 
 class SpaceGame : public Game 
 {
@@ -47,6 +48,9 @@ private:
 
 	//Last ship chunk
 	ChunkLocation lastShipLocation = { 0,0 };
+
+	//HUD
+	HUD m_HUD;
 };
 
 //Define where in array held persist is kept

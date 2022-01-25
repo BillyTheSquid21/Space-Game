@@ -20,15 +20,8 @@ void Chunk::makeGrid() {
 }
 
 void Chunk::render() {
-	if (m_Renderer->isInBounds(&m_L1, GetVerticesCount(Shape::LINE))) {
-		Renderer::commitPrimitive(&m_L1, GetElementCount(Shape::LINE),
-			Renderer::s_Line_I, Renderer::IND_LINE);
-	}
-
-	if (m_Renderer->isInBounds(&m_L2, GetVerticesCount(Shape::LINE))) {
-		Renderer::commitPrimitive(&m_L2, GetElementCount(Shape::LINE),
-			Renderer::s_Line_I, Renderer::IND_LINE);
-	}
+	Renderer::commitPrimitive(&m_L1, GetElementCount(Shape::LINE), Renderer::s_Line_I, Renderer::IND_LINE);
+	Renderer::commitPrimitive(&m_L2, GetElementCount(Shape::LINE), Renderer::s_Line_I, Renderer::IND_LINE);
 }
 
 //Object management

@@ -4,21 +4,21 @@
 Quad CreateQuad(float x, float y, float width, float height) {
 
 
-	Vertex v0;
+	Vertex v0{};
 	v0.position = { x - (width / 2), y - (height / 2),  LAYER_5 };
-	v0.color = { 1.0f, 0.0f, 1.0f };
+	v0.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
-	Vertex v1;
+	Vertex v1{};
 	v1.position = { x + (width / 2), y - (height / 2),  LAYER_5 };
-	v1.color = { 1.0f, 0.0f, 1.0f };
+	v1.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
-	Vertex v2;
+	Vertex v2{};
 	v2.position = { x + (width / 2), y + (height / 2),  LAYER_5 };
-	v2.color = { 1.0f, 0.0f, 1.0f };
+	v2.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
-	Vertex v3;
+	Vertex v3{};
 	v3.position = { x - (width / 2), y + (height / 2),  LAYER_5 };
-	v3.color = { 1.0f, 0.0f, 1.0f };
+	v3.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
 	return { v0, v1, v2, v3 };
 }
@@ -32,21 +32,21 @@ Line CreateLine(float xStart, float yStart, float xEnd, float yEnd, float stroke
 	float magnitude = invSqrt((xScale * xScale) + (yScale * yScale));
 	xScale *= -1 * magnitude; yScale *= magnitude;
 
-	Vertex v0;
+	Vertex v0{};
 	v0.position = { xStart - (xScale * stroke), yStart - (yScale * stroke),  LAYER_2 };
-	v0.color = { 0.20f, 0.20f, 0.22f };
+	v0.color = { 0.20f, 0.20f, 0.22f, 1.0f };
 
-	Vertex v1;
+	Vertex v1{};
 	v1.position = { xStart + (xScale * stroke), yStart + (yScale * stroke),  LAYER_2 };
-	v1.color = { 0.20f, 0.20f, 0.22f };
+	v1.color = { 0.20f, 0.20f, 0.22f, 1.0f };
 
-	Vertex v2;
+	Vertex v2{};
 	v2.position = { xEnd + (xScale * stroke), yEnd + (yScale * stroke),  LAYER_2 };
-	v2.color = { 0.20f, 0.20f, 0.22f };
+	v2.color = { 0.20f, 0.20f, 0.22f, 1.0f };
 
-	Vertex v3;
+	Vertex v3{};
 	v3.position = { xEnd - (xScale * stroke), yEnd - (yScale * stroke),  LAYER_2 };
-	v3.color = { 0.20f, 0.20f, 0.22f };
+	v3.color = { 0.20f, 0.20f, 0.22f, 1.0f };
 
 	return { v0, v1, v2, v3 };
 }
@@ -54,17 +54,17 @@ Line CreateLine(float xStart, float yStart, float xEnd, float yEnd, float stroke
 //Creates upright equilateral triangle with approx radian values
 Tri CreateTri(float x, float y, float radius) {
 
-	Vertex v0;
+	Vertex v0{};
 	v0.position = { (radius * cos(1.5708f)) + x, (radius * sin(1.5708f)) + y,  LAYER_5 };
-	v0.color = { 1.0f, 0.0f, 1.0f };
+	v0.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
-	Vertex v1;
+	Vertex v1{};
 	v1.position = { (radius * cos(3.6652f)) + x, (radius * sin(3.6652f)) + y,  LAYER_5 };
-	v1.color = { 1.0f, 0.0f, 1.0f };
+	v1.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
-	Vertex v2;
+	Vertex v2{};
 	v2.position = { (radius * cos(5.7596f)) + x, (radius * sin(5.7596f)) + y,  LAYER_5 };
-	v2.color = { 1.0f, 0.0f, 1.0f };
+	v2.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
 	return { v0, v1, v2};
 }
@@ -72,21 +72,21 @@ Tri CreateTri(float x, float y, float radius) {
 Circle CreateCircle(float x, float y, float radius) {
 
 	//init array
-	Circle circle;
+	Circle circle{};
 
 	//Make Centre
-	Vertex v0;
+	Vertex v0{};
 	v0.position = { x, y, LAYER_5 };
-	v0.color = { 1.0f, 0.0f, 1.0f };
+	v0.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 
 	circle[0] = v0;
 
 	//Make 64 concentric vertices
 	float angle = 0.0f;
 	for (int i = 1; i < 65; i++) {
-		Vertex vI;
+		Vertex vI{};
 		vI.position = { (radius * cos(angle)) + x, (radius * sin(angle)) + y,  LAYER_5 };
-		vI.color = { 1.0f, 0.0f, 1.0f };
+		vI.color = { 1.0f, 0.0f, 1.0f, 1.0f };
 		angle += 0.0998f; //angle increase by approx 360/64 in radians 
 		circle[i] = vI;
 	}
@@ -94,31 +94,73 @@ Circle CreateCircle(float x, float y, float radius) {
 	return circle;
 }
 
+Ring CreateRing(float x, float y, float radius, float stroke) {
+	
+	//init array
+	Ring ring{};
+	unsigned int ringIndex = 0;
+
+	//Centre = x, y
+
+	//Make 32 lines moving around
+	float angle = 0.0f;
+	float xPrev = 0.0f;
+	float xNext = 0.0f;
+	float yPrev = 0.0f;
+	float yNext = 0.0f;
+	for (int i = 1; i < RING_LINE_COUNT; i++) {
+		Line line{};
+		xPrev = x + radius * cos(angle);
+		yPrev = y + radius * sin(angle);
+		angle += 0.1f; //angle increase by approx 360/42 in radians 
+		xNext = x + radius * cos(angle);
+		yNext = y + radius * sin(angle);
+
+		//make line
+		line = CreateLine(xPrev, yPrev, xNext, yNext, stroke);
+
+		//copy into next space in ring
+		ring[ringIndex] = line;
+		ringIndex++;
+	}
+	return ring;
+}
+
 unsigned short int GetVerticesCount(Shape type) {
-	unsigned short int numberOfVertices;
 	switch (type)
 	{
+	//Base primitives
 	case Shape::TRI:
-		numberOfVertices = 3;
-		break;
+		return TRI_VERT;
 	case Shape::QUAD:
-		numberOfVertices = 4;
-		break;
+		return QUAD_VERT;
 	case Shape::LINE:
-		numberOfVertices = 4;
-		break;
+		return QUAD_VERT;
 	case Shape::CIRCLE:
-		numberOfVertices = 65;
-		break;
+		return CIRCLE_VERT;
+
+	//Derived primitives
+	case Shape::RING:
+		return RING_LINE_COUNT * QUAD_VERT;
 	default:
-		numberOfVertices = 0;
-		break;
+		return 0;
 	}
-	return numberOfVertices;
+}
+
+unsigned short int GetBasePrimitiveCount(Shape type) {
+	switch (type)
+	{
+	//Derived primitives
+	case Shape::RING:
+		return RING_LINE_COUNT;
+	//For all base classes, simply returns one
+	default:
+		return 1;
+	}
 }
 
 unsigned short int GetElementCount(Shape type) {
-	return 6 * GetVerticesCount(type);
+	return (sizeof(Vertex) / sizeof(float)) * GetVerticesCount(type);
 }
 
 //Translation
@@ -224,5 +266,13 @@ void ScaleShape(void* verticesArray, float scale, float centreX, float centreY, 
 		float newY = (centreY - vertices[i].position.b) * scale;
 		vertices[i].position.a = newX + centreX;
 		vertices[i].position.b = newY + centreY;
+	}
+}
+
+void TransparencyShape(void* verticesArray, float alpha, Shape type) {
+	Vertex* vertices = (Vertex*)verticesArray;
+
+	for (int i = 0; i < GetVerticesCount(type); i++) {
+		vertices[i].color.d = alpha;
 	}
 }

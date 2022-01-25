@@ -346,7 +346,7 @@ void World::updatePhysicsBullets(double deltaTime, double time) {
 			float direction = m_WorldShips[i].ship->direction() + SG_PI / 2;
 			float xPos = m_WorldShips[i].ship->xPos() + 200.0f * cos(direction);
 			float yPos = m_WorldShips[i].ship->yPos() + 200.0f * sin(direction);
-			Bullet bullet = Bullet::Bullet(xPos, yPos, m_WorldShips[i].ship->veloctiy() + 4500.0f, direction);
+			Bullet bullet = Bullet::Bullet(xPos, yPos, m_WorldShips[i].ship->veloctiy() + 40000.0f, direction);
 			bullet.setRenderer(m_Renderer);
 			m_ProjectileManager.addBullet(bullet);
 		}

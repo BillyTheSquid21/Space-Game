@@ -152,6 +152,8 @@
     <ClCompile Include="src\Chunk.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
+    <ClCompile Include="src\GLClasses.cpp" />
+    <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SGPhysics.cpp" />
     <ClCompile Include="src\SGUtil.cpp" />
@@ -168,6 +170,8 @@
     <ClInclude Include="include\Chunk.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\GameObject.h" />
+    <ClInclude Include="include\GLClasses.h" />
+    <ClInclude Include="include\HUD.h" />
     <ClInclude Include="include\ObjectManagement.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\SGPhysics.h" />
@@ -176,6 +180,7 @@
     <ClInclude Include="include\Ship.h" />
     <ClInclude Include="include\SpaceGame.h" />
     <ClInclude Include="include\Orbitals.h" />
+    <ClInclude Include="include\Vertex.hpp" />
     <ClInclude Include="include\World.h" />
   </ItemGroup>
   <ItemGroup>

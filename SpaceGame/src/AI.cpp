@@ -20,13 +20,27 @@ void AI::update(double deltaTime) {
 
 	//Reset rotation and point at target
 	if (!m_Orbit) {
-		angle = direction;
-		m_ShipControlling->resetRotation();
-		m_ShipControlling->rotate(angle - SG_PI / 2);
-
-		//Ship brakes if cornering and not in orbit
-		if (abs(angle - travelDirection) > SG_PI / 2 && abs(angle - travelDirection) < (2 * SG_PI) - SG_PI / 2) {
+		//if player is dying, put brakes on and break out of statement
+		if (m_Target->dying()) {
 			m_Brake = true;
+		}
+		else {
+			angle = direction;
+			m_ShipControlling->resetRotation();
+			m_ShipControlling->rotate(angle - SG_PI / 2);
+
+			//Ship brakes if cornering and not in orbit
+			if (abs(angle - travelDirection) > SG_PI / 2 && abs(angle - travelDirection) < (2 * SG_PI) - SG_PI / 2) {
+				m_Brake = true;
+			}
+
+			//Checks if facing player and close, and then shoots
+			if (abs(angle - travelDirection) > SG_PI / 5 && abs(angle - travelDirection) < (2 * SG_PI) - SG_PI / 5) {
+				if (CalculateDistance(m_ShipControlling->xPos(), m_ShipControlling->yPos(),
+					m_Target->xPos(), m_Target->yPos()) < 25000.0f) {
+					m_ShipControlling->shoot();
+				}
+			}
 		}
 	}
 	else {
@@ -42,7 +56,7 @@ void AI::update(double deltaTime) {
 			m_Brake = false;
 
 			//allows accelerating here so ships don't get stuck
-			m_ShipControlling->accelerate(5000.0f * deltaTime);
+			m_ShipControlling->accelerate(3500.0f * deltaTime);
 		}
 		else {
 			m_ShipControlling->brake(deltaTime);
