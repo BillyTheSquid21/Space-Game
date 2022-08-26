@@ -1,6 +1,2 @@
 # SpaceGame
-Simple Primitive Rendering Engine with Space Game Demo
-
-Provides support for shape creation and coloring, layering primitives, camera movement and scaling.
-
-Implements batch primitive rendering, update cap and delta time, key and scroll callbacks
+Simple Game Project I made in a week while learning C++ - The framework has continued and been vastly improved in the Space-Engine repository
